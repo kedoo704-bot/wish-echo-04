@@ -7,7 +7,7 @@ export const Route = createFileRoute("/w/$token")({
   component: WishPage,
   head: () => ({
     meta: [
-      { title: "A wish for you ✦ WishCraft" },
+      { title: "A wish for you ✦ Kehdoo" },
       { name: "description", content: "Someone sent you a beautiful greeting." },
     ],
   }),
@@ -49,7 +49,7 @@ function WishPage() {
     <main className="relative min-h-screen px-6 py-10">
       <WishBackground bg={wish.bg} />
       <div className="mx-auto max-w-2xl">
-        <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← WishCraft</Link>
+        <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">← Kehdoo</Link>
 
         <article className="mt-8 rounded-3xl border border-border bg-card/85 p-8 text-center shadow-[0_30px_80px_-30px_rgba(180,80,60,0.3)] backdrop-blur md:p-14">
           <div className="text-5xl md:text-6xl animate-[floaty_4s_ease-in-out_infinite]">{typeMeta.emoji}</div>
