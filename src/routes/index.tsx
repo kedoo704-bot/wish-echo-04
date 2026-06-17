@@ -30,7 +30,7 @@ function Chip({ children, active, onClick }: { children: React.ReactNode; active
 
 function Index() {
   const navigate = useNavigate();
-  const [type, setType] = useState(MESSAGE_TYPES[0].id);
+  const [type, setType] = useState<string>(MESSAGE_TYPES[0].id);
   const [to, setTo] = useState("");
   const [from, setFrom] = useState("");
   const [message, setMessage] = useState("");
