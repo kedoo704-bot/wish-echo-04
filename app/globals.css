@@ -1,4 +1,5 @@
 @import "tailwindcss" source(none);
+@source "../app";
 @source "../src";
 @import "tw-animate-css";
 
@@ -42,7 +43,6 @@
 
 :root {
   --radius: 1.25rem;
-  /* Blush canvas, deep plum ink */
   --background: oklch(0.985 0.012 20);
   --foreground: oklch(0.22 0.04 320);
   --card: oklch(1 0 0);
@@ -63,7 +63,6 @@
   --input: oklch(0.93 0.02 340);
   --ring: oklch(0.55 0.21 350);
 
-  /* Romantic blush -> peach -> lavender canvas */
   --gradient-warm-value:
     radial-gradient(1100px 700px at 92% -10%, oklch(0.92 0.10 30 / 0.65), transparent 60%),
     radial-gradient(900px 600px at -10% 110%, oklch(0.88 0.10 320 / 0.55), transparent 60%),
@@ -101,7 +100,6 @@
   ::selection { background: oklch(0.88 0.12 350); color: oklch(0.22 0.05 340); }
 }
 
-/* Grain overlay for texture */
 .grain::before {
   content: "";
   position: fixed; inset: 0; pointer-events: none; z-index: 1;
@@ -110,7 +108,6 @@
   mix-blend-mode: multiply;
 }
 
-/* Animations */
 @keyframes floaty {
   0%,100% { transform: translateY(0) rotate(0deg); }
   50% { transform: translateY(-22px) rotate(6deg); }

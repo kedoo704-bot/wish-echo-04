@@ -1,4 +1,5 @@
 import { MESSAGE_TYPES } from "@/lib/wish";
+import { toSrc } from "@/lib/image-compress";
 
 type Props = {
   type: string;
@@ -7,6 +8,7 @@ type Props = {
   message: string;
   bg: string;
   theme: string;
+  photo?: string;
 };
 
 const BG_EMOJI: Record<string, string[]> = {
@@ -19,7 +21,7 @@ const BG_EMOJI: Record<string, string[]> = {
   gradient: [],
 };
 
-export function WishPreview({ type, to, from, message, bg }: Props) {
+export function WishPreview({ type, to, from, message, bg, photo }: Props) {
   const t = MESSAGE_TYPES.find((m) => m.id === type) ?? MESSAGE_TYPES[0];
   const emojis = BG_EMOJI[bg] ?? [];
   return (
@@ -41,6 +43,11 @@ export function WishPreview({ type, to, from, message, bg }: Props) {
           {e}
         </span>
       ))}
+      {photo && (
+        <div className="absolute right-4 top-4 z-20 h-14 w-14 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-lg">
+          <img src={toSrc(photo)} alt="" className="h-full w-full object-cover" />
+        </div>
+      )}
       <div className="relative z-10 px-7 py-10 text-center md:px-10 md:py-14">
         <div className="text-5xl md:text-6xl" style={{ animation: "floaty 5s ease-in-out infinite" }}>{t.emoji}</div>
         <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">{t.label}</p>
