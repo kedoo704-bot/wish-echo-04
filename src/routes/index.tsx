@@ -5,7 +5,7 @@ import { MESSAGE_TYPES, TONES, THEMES, BACKGROUNDS, encodeWish } from "@/lib/wis
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "WishCraft — Say it beautifully, share it instantly" },
+      { title: "Kehdoo — Jo dil mein hai, Kehdoo" },
       { name: "description", content: "Turn a few words into a gorgeous animated greeting page. Share via WhatsApp, social or QR. No login, no backend — just a link." },
     ],
   }),
@@ -51,7 +51,7 @@ function Index() {
       <header className="flex items-center justify-between">
         <a href="/" className="flex items-center gap-2">
           <span className="grid h-9 w-9 place-items-center rounded-full text-lg" style={{ background: "var(--gradient-accent)" }}>✦</span>
-          <span className="font-serif text-xl font-semibold tracking-tight">WishCraft</span>
+          <span className="font-serif text-xl font-semibold tracking-tight">Kehdoo</span>
         </a>
         <nav className="hidden gap-6 text-sm text-muted-foreground md:flex">
           <a href="#thank-you" className="hover:text-foreground">Thank you</a>
@@ -68,14 +68,14 @@ function Index() {
             No login. No backend. Just a link.
           </span>
           <h1 className="mt-6 font-serif text-5xl leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
-            Say it beautifully.
+            Jo dil mein hai,
             <br />
             <span className="italic" style={{ backgroundImage: "var(--gradient-accent)", WebkitBackgroundClip: "text", backgroundClip: "text", color: "transparent" }}>
-              Share it instantly.
+              Kehdoo.
             </span>
           </h1>
           <p className="mt-6 max-w-md text-base text-muted-foreground md:text-lg">
-            WishCraft turns a few words into a personal greeting page — animated, gorgeous, and ready to share via WhatsApp, social, or QR code.
+            Kehdoo turns a few words into a personal greeting page — animated, gorgeous, and ready to share via WhatsApp, social, or QR code.
           </p>
           <div className="mt-8 flex flex-wrap gap-2">
             {MESSAGE_TYPES.slice(0, 8).map((m) => (
@@ -161,7 +161,7 @@ function Index() {
       </section>
 
       <footer className="mt-20 flex flex-col items-center justify-between gap-2 border-t border-border/60 pt-6 text-sm text-muted-foreground md:flex-row">
-        <p>© WishCraft — made with care.</p>
+        <p>© Kehdoo — made with care.</p>
         <p>Everything lives in the link. We never store your messages.</p>
       </footer>
     </main>
