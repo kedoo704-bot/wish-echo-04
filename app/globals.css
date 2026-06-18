@@ -138,3 +138,32 @@
   color: transparent;
   animation: shimmer 6s linear infinite;
 }
+
+/* Native scroll momentum */
+body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }
+
+/* Active press feedback for touch */
+.touch-card { -webkit-tap-highlight-color: transparent; }
+.touch-card:active { transform: scale(0.97); }
+
+/* Safe area helpers */
+.safe-top { padding-top: env(safe-area-inset-top, 16px); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom, 20px); }
+
+/* Step dot pill animation */
+@keyframes dot-expand { from { width: 8px; } to { width: 24px; } }
+
+/* Bottom sheet slide up */
+@keyframes sheet-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.animate-sheet-up { animation: sheet-up 0.4s cubic-bezier(0.32, 0.72, 0, 1) both; }
+
+/* Scale spring for cards */
+@keyframes pop-in {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-pop { animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }

@@ -246,6 +246,7 @@ export async function renderGreetingCard(
   if (photo) {
     try {
       const photoSrc = (() => {
+        if (photo.startsWith("http") || photo.startsWith("data:")) return photo;
         const b64 = photo.replace(/-/g, "+").replace(/_/g, "/");
         const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
         return `data:image/jpeg;base64,${padded}`;

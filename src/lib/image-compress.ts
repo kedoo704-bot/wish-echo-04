@@ -43,12 +43,22 @@ export async function compressImage(file: File): Promise<string> {
   });
 }
 
-/** Reconstruct a usable src from raw base64url */
+/** Reconstruct a usable src — handles blob:, https:, data: URLs and legacy base64url */
 export function toSrc(raw: string): string {
-  // Convert base64url → standard base64
+  if (raw.startsWith("blob:") || raw.startsWith("http") || raw.startsWith("data:")) return raw;
   const b64 = raw.replace(/-/g, "+").replace(/_/g, "/");
   const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
   return `data:image/jpeg;base64,${padded}`;
+}
+
+/** Convert raw base64url string to a Blob for uploading */
+export function toBlob(raw: string): Blob {
+  const b64 = raw.replace(/-/g, "+").replace(/_/g, "/");
+  const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
+  const binary = atob(padded);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new Blob([bytes], { type: "image/jpeg" });
 }
 
 /** Estimated URL byte length added by the photo param */
