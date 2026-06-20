@@ -8,6 +8,13 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
+const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const PHOTO_BUCKET = "card-photos";
+
+function getPublicPhotoUrl(path: string | null): string | null {
+  if (!SUPABASE_URL || !path) return null;
+  return `${SUPABASE_URL}/storage/v1/object/public/${PHOTO_BUCKET}/${encodeURIComponent(path)}`;
+}
 
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -20,6 +27,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const description = wish ? getShareDescription(wish) : "Someone sent you a mesmerising greeting";
 
   const logoUrl = new URL("/brand/main-logo-lockup.png", BASE).toString();
+  const photoUrl = getPublicPhotoUrl(card?.photo_path ?? null);
 
   return new ImageResponse(
     (
@@ -60,35 +68,59 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
+            alignItems: "center",
+            gap: 34,
             border: "1px solid rgba(194, 84, 126, 0.25)",
             background: "rgba(255, 255, 255, 0.72)",
             borderRadius: 38,
-            padding: "48px 58px",
+            padding: photoUrl ? "34px 42px" : "48px 58px",
             boxShadow: "0 32px 90px rgba(125, 50, 88, 0.16)",
           }}
         >
+          {photoUrl ? (
+            <img
+              src={photoUrl}
+              alt=""
+              style={{
+                width: 216,
+                height: 216,
+                objectFit: "cover",
+                borderRadius: 38,
+                boxShadow: "0 24px 60px rgba(125, 50, 88, 0.18)",
+              }}
+            />
+          ) : (
+            <img src={logoUrl} alt="" style={{ width: 420, height: "auto" }} />
+          )}
           <div
             style={{
-              fontSize: title.length > 54 ? 48 : 58,
-              lineHeight: 1.08,
-              color: "#241326",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              flex: 1,
             }}
           >
-            {title}
-          </div>
-          <div
-            style={{
-              marginTop: 22,
-              fontFamily: "system-ui",
-              fontSize: 28,
-              lineHeight: 1.45,
-              color: "#63465c",
-              maxWidth: 900,
-            }}
-          >
-            {description}
+            <div
+              style={{
+                fontSize: title.length > 54 ? 45 : 54,
+                lineHeight: 1.08,
+                color: "#241326",
+              }}
+            >
+              {title}
+            </div>
+            <div
+              style={{
+                marginTop: 20,
+                fontFamily: "system-ui",
+                fontSize: 27,
+                lineHeight: 1.42,
+                color: "#63465c",
+                maxWidth: photoUrl ? 590 : 900,
+              }}
+            >
+              {description}
+            </div>
           </div>
         </div>
 

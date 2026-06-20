@@ -21,10 +21,6 @@ export function getShareDescription(payload: WishPayload): string {
   return payload.from ? clean(payload.from) : "Someone sent you a mesmerising greeting";
 }
 
-export function getShareImage(): string {
-  return "/brand/og-image.png";
-}
-
 export function getShareText(url: string): string {
   return `You've got a kehdoo: ${url}`;
 }

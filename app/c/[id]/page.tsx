@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { MESSAGE_TYPES } from "@/lib/wish";
 import CardDisplay from "@/components/CardDisplay";
 import { getCardById } from "@/lib/get-card";
-import { getShareDescription, getShareImage, getShareTitle } from "@/lib/share";
+import { getShareDescription, getShareTitle } from "@/lib/share";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const title = getShareTitle(card.payload);
   const description = getShareDescription(card.payload);
   const url = `${BASE}/c/${id}`;
-  const image = getShareImage();
+  const image = `${url}/opengraph-image`;
 
   return {
     title,

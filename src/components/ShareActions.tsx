@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-import Link from "next/link";
-import { Check, Copy, Download, MessageCircle, Printer, Share2 } from "lucide-react";
+import { Check, Copy, Download, Share2 } from "lucide-react";
 import type { WishPayload } from "@/lib/wish";
-import { downloadCardAsPng, printCard } from "@/lib/card-canvas";
+import { downloadCardAsPng } from "@/lib/card-canvas";
 import { getShareText, getShareTitle } from "@/lib/share";
 
 /**
@@ -31,7 +30,6 @@ export function ShareActions({
   const [copied, setCopied] = useState(false);
   const [currentShareUrl, setCurrentShareUrl] = useState("");
   const [downloading, setDownloading] = useState(false);
-  const [printing, setPrinting] = useState(false);
   const [actionNotice, setActionNotice] = useState("");
   const [manualCopyText, setManualCopyText] = useState("");
 
@@ -124,15 +122,6 @@ export function ShareActions({
     }
   };
 
-  const handlePrint = async () => {
-    setPrinting(true);
-    try {
-      await printCard(wish, emoji, label, photo);
-    } finally {
-      setPrinting(false);
-    }
-  };
-
   return (
     <div
       className={`safe-bottom fixed inset-x-0 bottom-0 z-50 px-4 pb-5 pt-6 transition-all duration-700 delay-200 ${
@@ -163,10 +152,10 @@ export function ShareActions({
           />
         )}
 
-        <div className="grid grid-cols-[1fr_auto] gap-2">
+        <div className="grid grid-cols-4 gap-2">
           <button
             onClick={tryNative}
-            className="btn-3d flex min-h-12 items-center justify-center gap-2 rounded-2xl py-3.5 text-base font-semibold"
+            className="btn-3d flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[10px] font-semibold"
           >
             <Share2 className="h-4 w-4" />
             Share
@@ -177,17 +166,15 @@ export function ShareActions({
             rel="noreferrer"
             aria-label="Share on WhatsApp"
             title="Share on WhatsApp"
-            className="btn-glass flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl"
+            className="btn-glass flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[10px] font-medium text-muted-foreground hover:text-foreground"
           >
-            <MessageCircle className="h-4 w-4" />
+            <WhatsAppIcon className="h-4 w-4 text-[#25D366]" />
+            WhatsApp
           </a>
-        </div>
-
-        <div className="mt-2 grid grid-cols-4 gap-2">
           <button
             onClick={copy}
             title={copied ? "Copied!" : "Copy link"}
-            className="btn-glass flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-medium text-muted-foreground hover:text-foreground"
+            className="btn-glass flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[10px] font-medium text-muted-foreground hover:text-foreground"
           >
             {copied ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
             {copied ? "Copied" : "Copy"}
@@ -196,7 +183,7 @@ export function ShareActions({
             onClick={handleDownloadPng}
             disabled={downloading}
             title="Download PNG"
-            className="btn-glass flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
+            className="btn-glass flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[10px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
           >
             {downloading ? (
               <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
@@ -205,28 +192,16 @@ export function ShareActions({
             )}
             Save
           </button>
-          <button
-            onClick={handlePrint}
-            disabled={printing}
-            title="Print or save PDF"
-            className="btn-glass flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-medium text-muted-foreground hover:text-foreground disabled:opacity-50"
-          >
-            {printing ? (
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
-            ) : (
-              <Printer className="h-4 w-4" />
-            )}
-            Print
-          </button>
-          <Link
-            href="/"
-            className="btn-glass flex min-h-11 flex-col items-center justify-center gap-1 rounded-2xl text-[10px] font-medium text-muted-foreground hover:text-foreground"
-          >
-            <span className="text-sm leading-none">+</span>
-            Create
-          </Link>
         </div>
       </div>
     </div>
+  );
+}
+
+function WhatsAppIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 32 32" aria-hidden="true" className={className} fill="currentColor">
+      <path d="M16.02 3.2A12.7 12.7 0 0 0 5.2 22.58L3.5 28.8l6.36-1.67A12.7 12.7 0 1 0 16.02 3.2Zm0 2.28a10.42 10.42 0 0 1 8.84 15.94 10.42 10.42 0 0 1-13.64 3.36l-.45-.27-3.78.99 1.01-3.68-.3-.48A10.42 10.42 0 0 1 16.02 5.48Zm-4.1 4.9c-.23 0-.6.08-.91.43-.31.34-1.2 1.17-1.2 2.86 0 1.68 1.23 3.31 1.4 3.54.17.23 2.37 3.79 5.86 5.16 2.9 1.14 3.5.91 4.13.85.63-.06 2.04-.83 2.33-1.63.29-.8.29-1.49.2-1.63-.09-.14-.31-.23-.66-.4-.34-.17-2.04-1-2.36-1.11-.31-.12-.54-.17-.77.17-.23.34-.88 1.11-1.08 1.34-.2.23-.4.26-.74.09-.34-.17-1.45-.53-2.77-1.7-1.02-.91-1.71-2.03-1.91-2.37-.2-.34-.02-.53.15-.7.16-.15.34-.4.51-.6.17-.2.23-.34.34-.57.12-.23.06-.43-.03-.6-.09-.17-.77-1.86-1.06-2.54-.28-.67-.56-.58-.77-.59h-.66Z" />
+    </svg>
   );
 }
