@@ -98,7 +98,7 @@ export function ShareActions({
     setManualCopyText("");
     if ("share" in navigator) {
       try {
-        const data = { title: shareTitle, text: shareText, url: resolvedUrl };
+        const data = { title: shareTitle, text: shareText };
         if ("canShare" in navigator && !navigator.canShare(data)) {
           await copyValue(shareText);
           return;

@@ -16,6 +16,21 @@ function getPublicPhotoUrl(path: string | null): string | null {
   return `${SUPABASE_URL}/storage/v1/object/public/${PHOTO_BUCKET}/${encodeURIComponent(path)}`;
 }
 
+async function getPhotoDataUrl(path: string | null): Promise<string | null> {
+  const url = getPublicPhotoUrl(path);
+  if (!url) return null;
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const contentType = response.headers.get("content-type") || "image/webp";
+    const bytes = Buffer.from(await response.arrayBuffer());
+    return `data:${contentType};base64,${bytes.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 export default async function Image({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const card = await getCardById(id);
@@ -27,7 +42,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const description = wish ? getShareDescription(wish) : "Someone sent you a mesmerising greeting";
 
   const logoUrl = new URL("/brand/main-logo-lockup.png", BASE).toString();
-  const photoUrl = getPublicPhotoUrl(card?.photo_path ?? null);
+  const photoUrl = await getPhotoDataUrl(card?.photo_path ?? null);
 
   return new ImageResponse(
     (

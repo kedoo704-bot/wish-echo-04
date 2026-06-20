@@ -14,11 +14,13 @@ export function getRecipientName(payload: Pick<WishPayload, "to">): string {
 
 export function getShareTitle(payload: WishPayload): string {
   const type = getWishType(payload).label;
-  return `A ${type} wish for ${getRecipientName(payload)} - by kehdoo`;
+  return `A ${type} wish for ${getRecipientName(payload)} - kehdoo`;
 }
 
 export function getShareDescription(payload: WishPayload): string {
-  return payload.from ? clean(payload.from) : "Someone sent you a mesmerising greeting";
+  return payload.from
+    ? `${clean(payload.from)} sent you a mesmerising greeting`
+    : "Someone sent you a mesmerising greeting";
 }
 
 export function getShareText(url: string): string {

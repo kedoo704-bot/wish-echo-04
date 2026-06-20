@@ -8,7 +8,12 @@ const INSTANT_ROUTES = new Set(["/about", "/privacy", "/terms"]);
 export default function AppMotion({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
-  if (INSTANT_ROUTES.has(pathname)) {
+  if (
+    pathname === "/" ||
+    INSTANT_ROUTES.has(pathname) ||
+    pathname.startsWith("/share/") ||
+    pathname.startsWith("/c/")
+  ) {
     return <>{children}</>;
   }
 

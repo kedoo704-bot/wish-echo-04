@@ -67,7 +67,7 @@ export default function WishCreator() {
           </div>
         )}
 
-        <section className="app-gutter min-h-0 flex-1 overflow-y-auto pb-24 pt-5 md:pb-22">
+        <section className="app-gutter min-h-0 flex-1 overflow-y-auto pb-6 pt-5">
           <div
             key={creator.step}
             className={
@@ -118,7 +118,7 @@ export default function WishCreator() {
         </section>
 
         {creator.step > 0 && (
-          <footer className="app-gutter safe-bottom fixed inset-x-0 bottom-0 z-40 mx-auto w-full max-w-[480px] border-t border-border/50 bg-background/92 pb-4 pt-3 backdrop-blur-xl md:absolute">
+          <footer className="app-gutter safe-bottom relative z-40 shrink-0 border-t border-border/50 bg-background/92 pb-4 pt-3 backdrop-blur-xl">
             <div className="flex items-center gap-2">
               {creator.step < TOTAL_STEPS - 1 ? (
                 <button
