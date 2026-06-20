@@ -1,13 +1,15 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createOptionalClient } from "@/lib/supabase/server";
 import { MESSAGE_TYPES } from "@/lib/wish";
 import type { CardRow } from "@/lib/cards";
+import { BrandLogo } from "@/components/BrandLogo";
 
 export const metadata = { title: "My Cards · Kehdoo" };
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
+  const supabase = await createOptionalClient();
+  if (!supabase) redirect("/");
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) redirect("/?signin=1");
@@ -23,15 +25,15 @@ export default async function DashboardPage() {
       <div className="mx-auto max-w-4xl">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center">
             <span
-              className="grid h-10 w-10 place-items-center rounded-2xl text-lg text-primary-foreground shadow-md"
+              className="hidden"
               style={{ background: "var(--gradient-accent)" }}
             >
               ✦
             </span>
             <div className="leading-tight">
-              <div className="font-serif text-2xl">Kehdoo</div>
+              <BrandLogo className="h-12 w-auto max-w-[170px] object-contain" priority />
             </div>
           </Link>
           <Link
@@ -85,7 +87,7 @@ export default async function DashboardPage() {
               return (
                 <Link
                   key={card.id}
-                  href={`/c/${card.id}`}
+                  href={`/share/${card.id}`}
                   className="group rounded-[1.75rem] border border-border/60 bg-card/70 p-5 backdrop-blur transition hover:-translate-y-1 hover:border-primary/40"
                   style={{ boxShadow: "var(--shadow-soft)" }}
                 >
@@ -109,7 +111,7 @@ export default async function DashboardPage() {
                   <div className="mt-4 flex items-center justify-between">
                     <p className="text-[11px] text-muted-foreground">{date}</p>
                     <span className="text-xs text-primary opacity-0 transition group-hover:opacity-100">
-                      Open →
+                      Manage →
                     </span>
                   </div>
                 </Link>

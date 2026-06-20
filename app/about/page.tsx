@@ -1,15 +1,23 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import StructuredData from "@/components/StructuredData";
+import { FAQ, faqLd } from "@/lib/seo";
+
+const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
+
+export const dynamic = "force-static";
 
 export const metadata: Metadata = {
-  title: "About — Kehdoo",
+  title: "About Kehdoo — Free Animated Greeting Card Maker",
   description:
-    "Kehdoo is a no-backend greeting creator. Everything lives in the link — no sign-up, no data stored.",
+    "Kehdoo turns a short message into a beautiful animated greeting you can share as a single link via WhatsApp, social, or QR. Free, no sign-up required.",
+  alternates: { canonical: `${BASE}/about` },
 };
 
 export default function AboutPage() {
   return (
     <main className="mx-auto max-w-2xl px-6 py-16 md:py-24">
+      <StructuredData data={faqLd} />
       <Link
         href="/"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
@@ -35,14 +43,30 @@ export default function AboutPage() {
             style, and generate a beautiful page that blooms when the recipient opens it.
           </p>
           <p>
-            The entire wish is encoded inside the URL itself. There is no database, no server, no
-            account. The link is the card.
+            You can create and share a card without an account at all. Sign in with Google only if
+            you want a personal dashboard that keeps your cards together. Either way, cards are
+            shared through a private, unguessable link and aren&apos;t indexed by search engines — and
+            any photo you add is resized and stripped of metadata before it&apos;s stored.
           </p>
           <p>
             Send it on WhatsApp, post it on Instagram, print a QR code, or email it. The experience
             is the same on every device — a full-screen animated greeting with your words front and
-            centre.
+            centre — and you can download it as a PNG or print it as a PDF.
           </p>
+        </section>
+
+        <section className="mt-14" aria-labelledby="faq-heading">
+          <h2 id="faq-heading" className="font-serif text-3xl">
+            Frequently asked questions
+          </h2>
+          <dl className="mt-6 space-y-6">
+            {FAQ.map(({ q, a }) => (
+              <div key={q}>
+                <dt className="text-lg font-semibold text-foreground">{q}</dt>
+                <dd className="mt-1.5 text-base leading-relaxed text-foreground/75">{a}</dd>
+              </div>
+            ))}
+          </dl>
         </section>
 
         <div

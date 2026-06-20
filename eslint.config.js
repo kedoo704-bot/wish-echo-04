@@ -11,7 +11,7 @@ const __dirname = dirname(__filename);
 const compat = new FlatCompat({ baseDirectory: __dirname });
 
 export default tseslint.config(
-  { ignores: ["dist", ".next", "out", "node_modules"] },
+  { ignores: ["dist", ".next", "out", "node_modules", "next-env.d.ts"] },
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     files: ["**/*.{ts,tsx}"],
@@ -22,7 +22,17 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/no-unused-vars": "off",
       "@typescript-eslint/no-explicit-any": "off",
+      "react/no-unescaped-entities": "off",
+      "@next/next/no-img-element": "off",
+      "import/no-anonymous-default-export": "off",
     },
   },
   ...compat.extends("next/core-web-vitals"),
+  {
+    rules: {
+      "react/no-unescaped-entities": "off",
+      "@next/next/no-img-element": "off",
+      "import/no-anonymous-default-export": "off",
+    },
+  },
 );

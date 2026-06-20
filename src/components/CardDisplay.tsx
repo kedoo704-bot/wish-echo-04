@@ -1,226 +1,217 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
+import { Gift, Volume2, VolumeX } from "lucide-react";
 import { MESSAGE_TYPES } from "@/lib/wish";
-import { downloadCardAsPng, printCard } from "@/lib/card-canvas";
 import { WishBackground } from "@/components/WishBackground";
+import { GreetingCard } from "@/components/GreetingCard";
+import { BrandLogo } from "@/components/BrandLogo";
 import { incrementViews, getPhotoUrl, type CardRow } from "@/lib/cards";
+
+const CHIME_NOTES = [261.63, 329.63, 392, 523.25, 349.23, 440];
+
+type AudioState = {
+  context: AudioContext;
+  gain: GainNode;
+  oscillator: OscillatorNode;
+  timer: number;
+};
+
+type AudioWindow = Window &
+  typeof globalThis & {
+    webkitAudioContext?: typeof AudioContext;
+  };
 
 export default function CardDisplay({ card }: { card: CardRow }) {
   const wish = card.payload;
   const typeMeta = MESSAGE_TYPES.find((m) => m.id === wish.type) ?? MESSAGE_TYPES[0];
   const photoUrl = card.photo_path ? getPhotoUrl(card.photo_path) : null;
 
-  const [copied, setCopied] = useState(false);
-  const [shareUrl, setShareUrl] = useState("");
   const [revealed, setRevealed] = useState(false);
-  const [downloading, setDownloading] = useState(false);
-  const [printing, setPrinting] = useState(false);
+  const [coverLeaving, setCoverLeaving] = useState(false);
+  const [muted, setMuted] = useState(false);
+  const audioRef = useRef<AudioState | null>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") setShareUrl(window.location.href);
-    const t = setTimeout(() => setRevealed(true), 300);
-    incrementViews(card.id);
-    return () => clearTimeout(t);
+    const viewKey = `kehdoo:viewed:${card.id}`;
+    const trackView = () => {
+      if (sessionStorage.getItem(viewKey)) return;
+      sessionStorage.setItem(viewKey, "1");
+      incrementViews(card.id);
+    };
+
+    const idleWindow = window as Window & {
+      requestIdleCallback?: (callback: () => void, options?: { timeout: number }) => void;
+    };
+    if (idleWindow.requestIdleCallback) {
+      idleWindow.requestIdleCallback(trackView, { timeout: 1500 });
+    } else {
+      setTimeout(trackView, 500);
+    }
+
+    return () => stopAudio();
   }, [card.id]);
 
-  const copy = async () => {
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const stopAudio = () => {
+    const state = audioRef.current;
+    if (!state) return;
+
+    window.clearInterval(state.timer);
+    const now = state.context.currentTime;
+    state.gain.gain.cancelScheduledValues(now);
+    state.gain.gain.setValueAtTime(Math.max(state.gain.gain.value, 0.0001), now);
+    state.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+    window.setTimeout(() => {
+      state.oscillator.stop();
+      state.context.close();
+    }, 560);
+    audioRef.current = null;
   };
 
-  const shareText = `${typeMeta.emoji} A wish for you from Kehdoo`;
-  const shareWhatsapp = `https://wa.me/?text=${encodeURIComponent(`${shareText}: ${shareUrl}`)}`;
+  const startAudio = async () => {
+    if (audioRef.current) return;
 
-  const tryNative = async () => {
-    if (
-      typeof navigator !== "undefined" &&
-      (navigator as Navigator & { share?: () => void }).share
-    ) {
-      try {
-        await (
-          navigator as Navigator & { share: (data: { title: string; text: string; url: string }) => Promise<void> }
-        ).share({ title: "Kehdoo", text: shareText, url: shareUrl });
-      } catch {
-        /* user cancelled */
-      }
-    } else {
-      copy();
-    }
+    const audioWindow = window as AudioWindow;
+    const AudioCtor = audioWindow.AudioContext || audioWindow.webkitAudioContext;
+    if (!AudioCtor) return;
+
+    const context = new AudioCtor();
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    let index = 0;
+
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(CHIME_NOTES[0], context.currentTime);
+    gain.gain.setValueAtTime(0.0001, context.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.12, context.currentTime + 0.7);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start();
+
+    const timer = window.setInterval(() => {
+      index = (index + 1) % CHIME_NOTES.length;
+      oscillator.frequency.setTargetAtTime(CHIME_NOTES[index], context.currentTime, 0.18);
+    }, 1400);
+
+    audioRef.current = { context, gain, oscillator, timer };
+    setMuted(false);
   };
 
-  const handleDownloadPng = async () => {
-    setDownloading(true);
-    try {
-      await downloadCardAsPng(wish, typeMeta.emoji, typeMeta.label, photoUrl ?? null);
-    } finally {
-      setDownloading(false);
-    }
+  const unwrap = async () => {
+    if (revealed || coverLeaving) return;
+
+    setCoverLeaving(true);
+    await startAudio();
+    window.setTimeout(() => setRevealed(true), 680);
   };
 
-  const handlePrint = async () => {
-    setPrinting(true);
-    try {
-      await printCard(wish, typeMeta.emoji, typeMeta.label, photoUrl ?? null);
-    } finally {
-      setPrinting(false);
+  const toggleAudio = () => {
+    const state = audioRef.current;
+    if (!state) return;
+
+    const now = state.context.currentTime;
+    state.gain.gain.cancelScheduledValues(now);
+    if (muted) {
+      state.gain.gain.setValueAtTime(0.0001, now);
+      state.gain.gain.exponentialRampToValueAtTime(0.12, now + 0.5);
+      setMuted(false);
+      return;
     }
+
+    state.gain.gain.setValueAtTime(Math.max(state.gain.gain.value, 0.0001), now);
+    state.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+    setMuted(true);
+  };
+
+  const startClean = () => {
+    stopAudio();
+    window.location.assign("/");
   };
 
   return (
-    <main className="relative min-h-[100dvh] pb-36">
+    <main className="relative min-h-[100dvh] overflow-hidden px-5 pb-28 pt-20 md:px-8 md:pb-32 md:pt-24">
       <WishBackground bg={wish.bg} />
 
-      {/* Floating back pill */}
-      <div className="safe-top pointer-events-none absolute inset-x-0 top-0 z-50 px-5 pt-4">
-        <Link
-          href="/"
-          className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-background/80 px-3.5 py-2 text-sm font-medium backdrop-blur-md transition active:scale-95 hover:bg-background/95"
-          style={{ boxShadow: "var(--shadow-soft)" }}
-        >
-          <span>←</span>
-          <span className="font-serif text-base">Kehdoo</span>
-        </Link>
-      </div>
-
-      {/* Card */}
-      <div className="relative z-10 mx-auto max-w-2xl px-5 pt-20 md:px-8">
-        <article
-          className={`relative overflow-hidden rounded-[2.5rem] border border-border/60 bg-card/85 p-8 text-center shadow-2xl backdrop-blur-md transition-all duration-700 md:p-14 ${
-            revealed ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-          }`}
-          style={{ boxShadow: "var(--shadow-soft)" }}
-        >
-          {photoUrl && (
-            <div className="absolute right-6 top-6 h-20 w-20 overflow-hidden rounded-full ring-[3px] ring-primary/30 shadow-xl">
-              <img src={photoUrl} alt="" className="h-full w-full object-cover" />
-            </div>
-          )}
-          <div
-            className="text-6xl md:text-8xl"
-            style={{ animation: "floaty 4s ease-in-out infinite" }}
-          >
-            {typeMeta.emoji}
+      <div className="safe-top pointer-events-none fixed inset-x-0 top-0 z-40 px-5 pt-4 md:px-8">
+        <div className="mx-auto flex max-w-2xl items-center justify-between">
+          <div className="inline-flex rounded-full border border-white/60 bg-background/82 px-3.5 py-2 shadow-lg backdrop-blur-xl">
+            <BrandLogo className="h-8 w-auto max-w-[128px] object-contain" priority />
           </div>
-          <p className="mt-5 text-[10px] font-semibold uppercase tracking-[0.38em] text-muted-foreground">
-            {typeMeta.label}
-          </p>
-          {wish.to && (
-            <h1 className="mt-7 font-serif text-5xl leading-[1.05] md:text-6xl">
-              Dear <span className="italic shimmer-text">{wish.to}</span>,
-            </h1>
+          {revealed && audioRef.current && (
+            <button
+              type="button"
+              onClick={toggleAudio}
+              className="btn-glass pointer-events-auto grid h-11 w-11 place-items-center rounded-full text-foreground"
+              aria-label={muted ? "Turn sound on" : "Mute sound"}
+            >
+              {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+            </button>
           )}
-          <p className="mx-auto mt-7 max-w-xl whitespace-pre-wrap font-serif text-2xl leading-relaxed text-foreground/90 md:text-3xl">
-            {wish.message}
-          </p>
-          {wish.from && (
-            <p className="mt-10 font-serif text-xl italic text-muted-foreground">
-              — with love, {wish.from}
-            </p>
-          )}
-          <div className="mx-auto mt-10 h-px w-20 bg-border/60" />
-          <p className="mt-4 font-serif text-sm italic text-muted-foreground/70">
-            Jo dil mein hai, Kehdoo.
-          </p>
-        </article>
+        </div>
       </div>
 
-      {/* Fixed bottom action bar */}
-      <div
-        className={`safe-bottom fixed inset-x-0 bottom-0 z-50 px-4 pb-5 pt-6 transition-all duration-700 delay-300 ${
-          revealed ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-        }`}
-        style={{
-          background: "linear-gradient(to top, var(--background) 70%, transparent)",
-        }}
-      >
-        {/* View count */}
-        <p className="mb-3 text-center text-[11px] text-muted-foreground">
-          {card.view_count > 1
-            ? `Opened ${card.view_count} times`
-            : "Just opened for the first time ✨"}
-        </p>
+      <div className="relative z-10 mx-auto flex min-h-[calc(100dvh-12rem)] w-full max-w-2xl flex-col justify-center gap-5">
+        <section className="recipient-stage relative">
+          {!revealed && (
+            <button
+              type="button"
+              onClick={unwrap}
+              className={`recipient-cover touch-card ${coverLeaving ? "is-leaving" : ""}`}
+              aria-label="Tap and unwrap the greeting"
+            >
+              <span className="recipient-glow recipient-glow-one" />
+              <span className="recipient-glow recipient-glow-two" />
+              <span className="recipient-cover-inner">
+                <span className="grid h-16 w-16 place-items-center rounded-3xl bg-white/18 text-white shadow-2xl backdrop-blur-md">
+                  <Gift className="h-8 w-8 animate-gift-bounce" />
+                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70">
+                  A Kehdoo for you
+                </span>
+                <span className="font-serif text-[clamp(2.6rem,14cqw,5.4rem)] leading-[0.92] text-white">
+                  Open this feeling
+                </span>
+                <span className="max-w-[25rem] text-sm leading-6 text-white/78">
+                  A little message is waiting behind the sleeve.
+                </span>
+                <span className="recipient-pulse-line" />
+                <span className="rounded-full bg-white px-5 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-primary shadow-xl">
+                  Tap & unwrap
+                </span>
+              </span>
+            </button>
+          )}
 
-        {/* Action row */}
-        <div className="flex items-center gap-2">
-          {/* Primary share button */}
-          <button
-            onClick={tryNative}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl py-3.5 text-base font-semibold text-primary-foreground transition-all active:scale-[0.97] active:brightness-95"
-            style={{
-              background: "var(--gradient-accent)",
-              boxShadow: "var(--shadow-glow)",
-            }}
-          >
-            ✦ Share
-          </button>
+          <div className={revealed ? "recipient-card-unwrapped" : "pointer-events-none opacity-0"}>
+            <GreetingCard
+              emoji={typeMeta.emoji}
+              label={typeMeta.label}
+              to={wish.to}
+              from={wish.from}
+              message={wish.message}
+              photoSrc={photoUrl}
+              revealed={revealed}
+            />
+          </div>
+        </section>
 
-          {/* Copy link */}
-          <button
-            onClick={copy}
-            aria-label="Copy link"
-            title={copied ? "Copied!" : "Copy link"}
-            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-border/60 bg-card/80 text-base backdrop-blur transition active:scale-95 hover:bg-card"
-            style={{ boxShadow: "var(--shadow-soft)" }}
-          >
-            {copied ? (
-              <span className="text-primary text-sm font-semibold">✓</span>
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-              </svg>
-            )}
-          </button>
-
-          {/* WhatsApp */}
-          <a
-            href={shareWhatsapp}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Share on WhatsApp"
-            title="Share on WhatsApp"
-            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-border/60 bg-card/80 backdrop-blur transition active:scale-95 hover:bg-card"
-            style={{ boxShadow: "var(--shadow-soft)" }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.116 1.522 5.847L0 24l6.303-1.504A11.954 11.954 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.006-1.37l-.36-.213-3.736.892.942-3.639-.234-.373A9.818 9.818 0 0 1 2.182 12c0-5.423 4.395-9.818 9.818-9.818 5.424 0 9.818 4.395 9.818 9.818 0 5.424-4.394 9.818-9.818 9.818z"/>
-            </svg>
-          </a>
-
-          {/* Download PNG */}
-          <button
-            onClick={handleDownloadPng}
-            disabled={downloading}
-            aria-label="Download as PNG"
-            title="Download PNG"
-            className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-border/60 bg-card/80 backdrop-blur transition active:scale-95 hover:bg-card disabled:opacity-50"
-            style={{ boxShadow: "var(--shadow-soft)" }}
-          >
-            {downloading ? (
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
-            ) : (
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="7 10 12 15 17 10"/>
-                <line x1="12" y1="15" x2="12" y2="3"/>
-              </svg>
-            )}
-          </button>
-        </div>
-
-        {/* Make your own */}
-        <div className="mt-3 text-center">
-          <Link
-            href="/"
-            className="text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline transition-colors"
-          >
-            Make your own →
-          </Link>
-        </div>
+        {revealed && (
+          <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
+            <section className="recipient-love-strip mx-auto flex max-w-2xl items-center gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-white">Love this card?</p>
+                <p className="truncate text-xs text-white/58">Make your own Kehdoo in a minute.</p>
+              </div>
+              <button
+                type="button"
+                onClick={startClean}
+                className="btn-3d h-10 shrink-0 rounded-full px-4 text-sm font-semibold"
+              >
+                Kehdoo
+              </button>
+            </section>
+          </div>
+        )}
       </div>
     </main>
   );

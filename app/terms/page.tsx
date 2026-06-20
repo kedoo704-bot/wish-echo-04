@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+export const dynamic = "force-static";
+
 export const metadata: Metadata = {
-  title: "Terms — Kehdoo",
-  description: "Terms of use for Kehdoo, the no-backend greeting card creator.",
+  title: "Terms - Kehdoo",
+  description: "Terms of use for Kehdoo, the greeting card creator.",
 };
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
@@ -22,12 +24,12 @@ export default function TermsPage() {
         href="/"
         className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
       >
-        <span>←</span> <span className="font-serif text-base">Kehdoo</span>
+        <span>{"<-"}</span> <span className="font-serif text-base">Kehdoo</span>
       </Link>
 
       <article className="mt-10">
         <h1 className="font-serif text-5xl leading-tight">Terms of Use</h1>
-        <p className="mt-3 text-sm text-muted-foreground">Last updated: June 2025</p>
+        <p className="mt-3 text-sm text-muted-foreground">Last updated: June 2026</p>
 
         <p className="mt-6 text-lg leading-relaxed text-muted-foreground">
           Kehdoo is a free tool for creating and sharing animated greeting cards. By using Kehdoo
@@ -51,8 +53,8 @@ export default function TermsPage() {
             about uptime, availability, or the permanent accessibility of any wish link.
           </p>
           <p>
-            Because wish data is encoded in the URL, a long URL may be truncated by certain
-            messaging apps. Always test your link before sharing if the message is time-sensitive.
+            Share links depend on Kehdoo's hosted service. Always test your link before sharing if
+            the message is time-sensitive.
           </p>
         </Section>
 
@@ -90,7 +92,7 @@ export default function TermsPage() {
       </article>
 
       <footer className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground">
-        <p>© Kehdoo · kehdoo.com</p>
+        <p>(c) Kehdoo - kehdoo.com</p>
         <nav className="flex gap-4">
           <Link href="/about" className="hover:text-foreground">About</Link>
           <Link href="/privacy" className="hover:text-foreground">Privacy</Link>

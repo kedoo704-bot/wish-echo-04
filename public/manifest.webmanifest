@@ -1,0 +1,40 @@
+{
+  "name": "Kehdoo",
+  "short_name": "Kehdoo",
+  "description": "Create and share heartfelt greeting cards.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "browser"],
+  "background_color": "#fff8f7",
+  "theme_color": "#f8e8ee",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/maskable-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Create a wish",
+      "short_name": "Create",
+      "url": "/",
+      "icons": [{ "src": "/brand/icon-192.png", "sizes": "192x192", "type": "image/png" }]
+    }
+  ]
+}

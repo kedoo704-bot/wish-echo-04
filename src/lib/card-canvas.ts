@@ -173,6 +173,8 @@ export async function renderGreetingCard(
 
   const cfg = CONFIGS[wish.type] ?? DEFAULT_CONFIG;
   const cx = CW / 2;
+  const SERIF = "Georgia, serif";
+  const SANS = "system-ui, sans-serif";
 
   /* ── 1. Background ─────────────────────────────────────────────────── */
   const bgGrad = ctx.createLinearGradient(0, 0, CW * 0.7, CH);
@@ -315,7 +317,7 @@ export async function renderGreetingCard(
 
   /* ── 8. Occasion label ────────────────────────────────────────────── */
   ctx.save();
-  ctx.font = "700 11.5px 'Work Sans', system-ui, sans-serif";
+  ctx.font = `700 11.5px ${SANS}`;
   ctx.fillStyle = cfg.frame;
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
@@ -347,7 +349,7 @@ export async function renderGreetingCard(
   let curY = 278;
 
   if (wish.to) {
-    ctx.font = "italic 50px 'Instrument Serif', Georgia, serif";
+    ctx.font = `italic 50px ${SERIF}`;
     ctx.fillStyle = cfg.titleColor;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
@@ -357,7 +359,7 @@ export async function renderGreetingCard(
 
   /* ── 10. Message ─────────────────────────────────────────────────── */
   if (wish.message) {
-    ctx.font = "400 23px 'Instrument Serif', Georgia, serif";
+    ctx.font = `400 23px ${SERIF}`;
     ctx.fillStyle = cfg.bodyColor;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
@@ -376,7 +378,7 @@ export async function renderGreetingCard(
   /* ── 11. Sender ──────────────────────────────────────────────────── */
   if (wish.from) {
     const fromY = Math.max(curY + 10, CH - 148);
-    ctx.font = "italic 22px 'Instrument Serif', Georgia, serif";
+    ctx.font = `italic 22px ${SERIF}`;
     ctx.fillStyle = cfg.mutedColor;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
@@ -397,7 +399,7 @@ export async function renderGreetingCard(
   ctx.globalAlpha = 1;
   ctx.restore();
 
-  ctx.font = "400 12px 'Work Sans', system-ui, sans-serif";
+  ctx.font = `400 12px ${SANS}`;
   ctx.fillStyle = cfg.mutedColor;
   ctx.textAlign = "center";
   ctx.textBaseline = "top";

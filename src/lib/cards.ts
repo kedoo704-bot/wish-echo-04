@@ -1,6 +1,5 @@
 import type { WishPayload } from "@/lib/wish";
-import { nanoid } from "@/lib/nanoid";
-import { createClient } from "@/lib/supabase/client";
+import { createOptionalClient } from "@/lib/supabase/client";
 
 export type CardRow = {
   id: string;
@@ -13,57 +12,39 @@ export type CardRow = {
 
 const BUCKET = "card-photos";
 
-async function uploadPhotoViaApi(file: File, cardId: string): Promise<string> {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("cardId", cardId);
-  const res = await fetch("/api/upload-photo", { method: "POST", body: formData });
-  if (!res.ok) {
-    const { error } = await res.json().catch(() => ({ error: "Upload failed" }));
-    throw new Error(error ?? "Upload failed");
-  }
-  const { path } = await res.json();
-  return path;
-}
-
+/**
+ * Public URL for a stored card photo. Reads are RLS-allowed, so the anon
+ * client can resolve the URL on either the client or server.
+ */
 export function getPhotoUrl(path: string): string {
-  const supabase = createClient();
+  const supabase = createOptionalClient();
+  if (!supabase) return "";
   return supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
 }
 
-export async function saveCard(
-  payload: WishPayload,
-  photoFile: File | null,
-  userId: string | null
-): Promise<string> {
-  const supabase = createClient();
-  const id = nanoid(8);
+/**
+ * Create a card via the secure server route. The client never inserts rows or
+ * uploads to storage directly. The server validates, derives ownership from
+ * the session, re-encodes the photo, and persists via Supabase service role.
+ */
+export async function saveCard(payload: WishPayload, photoFile: File | null): Promise<string> {
+  const form = new FormData();
+  form.set("payload", JSON.stringify(payload));
+  if (photoFile) form.set("file", photoFile);
 
-  const photo_path = photoFile ? await uploadPhotoViaApi(photoFile, id) : null;
-
-  const { error } = await supabase.from("cards").insert({
-    id,
-    payload,
-    photo_path,
-    created_by: userId,
-  });
-
-  if (error) throw error;
-  return id;
+  const res = await fetch("/api/cards", { method: "POST", body: form });
+  if (!res.ok) {
+    throw new Error(`Card creation failed (${res.status})`);
+  }
+  const data = (await res.json()) as { id: string };
+  return data.id;
 }
 
-export async function getCard(id: string): Promise<CardRow | null> {
-  const supabase = createClient();
-  const { data, error } = await supabase
-    .from("cards")
-    .select("*")
-    .eq("id", id)
-    .single();
-  if (error) return null;
-  return data as CardRow;
-}
-
+/** Best-effort view increment via the server. */
 export async function incrementViews(id: string): Promise<void> {
-  const supabase = createClient();
-  await supabase.rpc("increment_card_views", { card_id: id });
+  try {
+    await fetch(`/api/cards/${id}/view`, { method: "POST", keepalive: true });
+  } catch {
+    // Non-critical.
+  }
 }

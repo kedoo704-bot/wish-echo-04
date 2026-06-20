@@ -22,6 +22,30 @@ export const BACKGROUNDS: Array<{ id: string; label: string; emoji: string }> = 
   { id: "stars", label: "Stars", emoji: "⭐" },
 ];
 
+/**
+ * Each background has its own gradient so the picker produces a visibly
+ * different mood (previously every option shared one mesh and "gradient"
+ * rendered nothing distinct). Shared by the live preview and the full page.
+ */
+export const BG_GRADIENTS: Record<string, string> = {
+  hearts:
+    "radial-gradient(700px 500px at 18% 12%, oklch(0.88 0.13 350 / 0.7), transparent 60%), radial-gradient(600px 460px at 85% 90%, oklch(0.86 0.12 10 / 0.6), transparent 62%), linear-gradient(180deg, oklch(0.985 0.012 350), oklch(0.95 0.04 350))",
+  gradient:
+    "radial-gradient(800px 520px at 10% 0%, oklch(0.86 0.14 30 / 0.7), transparent 60%), radial-gradient(700px 520px at 95% 100%, oklch(0.82 0.14 320 / 0.65), transparent 62%), linear-gradient(140deg, oklch(0.93 0.08 60), oklch(0.9 0.09 350))",
+  floral:
+    "radial-gradient(640px 480px at 20% 18%, oklch(0.88 0.12 350 / 0.6), transparent 60%), radial-gradient(620px 480px at 82% 84%, oklch(0.9 0.1 150 / 0.55), transparent 62%), linear-gradient(180deg, oklch(0.985 0.012 340), oklch(0.95 0.04 150))",
+  confetti:
+    "radial-gradient(620px 460px at 12% 10%, oklch(0.86 0.15 30 / 0.62), transparent 58%), radial-gradient(620px 460px at 88% 18%, oklch(0.85 0.14 200 / 0.55), transparent 60%), radial-gradient(680px 520px at 50% 100%, oklch(0.86 0.14 320 / 0.55), transparent 64%), linear-gradient(180deg, oklch(0.98 0.02 90), oklch(0.95 0.04 320))",
+  sunrise:
+    "radial-gradient(820px 540px at 50% -8%, oklch(0.9 0.13 70 / 0.8), transparent 60%), radial-gradient(640px 500px at 90% 95%, oklch(0.84 0.14 35 / 0.6), transparent 62%), linear-gradient(180deg, oklch(0.97 0.05 80), oklch(0.93 0.08 40))",
+  balloons:
+    "radial-gradient(640px 480px at 16% 14%, oklch(0.85 0.13 250 / 0.6), transparent 60%), radial-gradient(620px 480px at 86% 88%, oklch(0.86 0.13 350 / 0.58), transparent 62%), linear-gradient(180deg, oklch(0.98 0.02 250), oklch(0.95 0.04 300))",
+  // Light twilight-lavender (not a dark night sky) so dark card text stays
+  // legible in the live preview as well as on the page background.
+  stars:
+    "radial-gradient(760px 520px at 22% 16%, oklch(0.82 0.1 290 / 0.65), transparent 60%), radial-gradient(680px 520px at 84% 88%, oklch(0.8 0.11 265 / 0.6), transparent 62%), linear-gradient(180deg, oklch(0.95 0.03 285), oklch(0.9 0.06 280))",
+};
+
 export type WishPayload = {
   type: string;
   to: string;
@@ -193,18 +217,3 @@ export const MESSAGE_TEMPLATES: Record<string, Template[]> = {
   ],
 };
 
-export function encodeWish(p: WishPayload): string {
-  const json = JSON.stringify(p);
-  const b64 = btoa(unescape(encodeURIComponent(json)));
-  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-}
-
-export function decodeWish(s: string): WishPayload | null {
-  try {
-    const b64 = s.replace(/-/g, "+").replace(/_/g, "/");
-    const json = decodeURIComponent(escape(atob(b64)));
-    return JSON.parse(json);
-  } catch {
-    return null;
-  }
-}
