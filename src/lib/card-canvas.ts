@@ -1,103 +1,5 @@
 import type { WishPayload } from "./wish";
 
-/* ─── Per-occasion card configs ─────────────────────────────────────── */
-
-type CardConfig = {
-  bg: [string, string, string];
-  frame: string;
-  titleColor: string;
-  bodyColor: string;
-  mutedColor: string;
-  cornerEmoji: [string, string, string, string];
-  scatter: string[];
-};
-
-const CONFIGS: Record<string, CardConfig> = {
-  "thank-you": {
-    bg: ["#FFF0F5", "#FFE0EE", "#FFD6E8"],
-    frame: "#E84393",
-    titleColor: "#3B0023",
-    bodyColor: "#4A0030",
-    mutedColor: "#9B4D6C",
-    cornerEmoji: ["💗", "🌸", "🌷", "💐"],
-    scatter: ["💗", "💖", "🌸", "✿", "❀"],
-  },
-  "sorry": {
-    bg: ["#F5F0FF", "#EDE0FF", "#E2D4FF"],
-    frame: "#7C3AED",
-    titleColor: "#2D0064",
-    bodyColor: "#3B0080",
-    mutedColor: "#7C50B0",
-    cornerEmoji: ["🌸", "🌷", "🕊️", "🌿"],
-    scatter: ["🌸", "🌷", "✿", "🌙", "🪷"],
-  },
-  "good-morning": {
-    bg: ["#FFFBEB", "#FFF3C4", "#FFE88A"],
-    frame: "#D97706",
-    titleColor: "#2C1400",
-    bodyColor: "#3A1A00",
-    mutedColor: "#92600A",
-    cornerEmoji: ["☀️", "🌤️", "🌻", "✨"],
-    scatter: ["☀️", "✨", "🌤️", "⭐", "🌟"],
-  },
-  "congrats": {
-    bg: ["#FFFEF0", "#FEFCE8", "#FEFACC"],
-    frame: "#B45309",
-    titleColor: "#1A1200",
-    bodyColor: "#2A1E00",
-    mutedColor: "#8B6914",
-    cornerEmoji: ["🎊", "⭐", "🏆", "🌟"],
-    scatter: ["🎊", "✨", "⭐", "🌟", "🎉"],
-  },
-  "birthday": {
-    bg: ["#FFF0F8", "#FFE0F4", "#FFD6F0"],
-    frame: "#EC4899",
-    titleColor: "#2A0018",
-    bodyColor: "#380020",
-    mutedColor: "#8B3060",
-    cornerEmoji: ["🎂", "🎈", "🎊", "🎉"],
-    scatter: ["🎈", "🎉", "🎊", "✨", "⭐"],
-  },
-  "get-well": {
-    bg: ["#F0FDF4", "#DCFCE7", "#C8F7D8"],
-    frame: "#059669",
-    titleColor: "#002616",
-    bodyColor: "#003820",
-    mutedColor: "#2D7A5E",
-    cornerEmoji: ["🌿", "🌱", "🍃", "🌺"],
-    scatter: ["🌿", "🌱", "🍃", "🌸", "✿"],
-  },
-  "miss-you": {
-    bg: ["#EFF6FF", "#DBEAFE", "#BFDBFE"],
-    frame: "#3B82F6",
-    titleColor: "#0A1628",
-    bodyColor: "#0F1F38",
-    mutedColor: "#3A6090",
-    cornerEmoji: ["💌", "🌙", "⭐", "💫"],
-    scatter: ["💌", "🌙", "⭐", "💫", "✨"],
-  },
-  "best-wishes": {
-    bg: ["#F0FDFA", "#CCFBF1", "#A7F3E8"],
-    frame: "#0D9488",
-    titleColor: "#002622",
-    bodyColor: "#003830",
-    mutedColor: "#2A7A72",
-    cornerEmoji: ["✨", "🌟", "⭐", "💫"],
-    scatter: ["✨", "🌟", "⭐", "💫", "🌠"],
-  },
-  "custom": {
-    bg: ["#FFF7ED", "#FFE8CC", "#FFDCA8"],
-    frame: "#EA580C",
-    titleColor: "#280800",
-    bodyColor: "#3A1200",
-    mutedColor: "#8B4020",
-    cornerEmoji: ["💫", "✨", "🌟", "⭐"],
-    scatter: ["💫", "✨", "🌟", "⭐", "🌠"],
-  },
-};
-
-const DEFAULT_CONFIG = CONFIGS["custom"];
-
 /* ─── Helpers ────────────────────────────────────────────────────────── */
 
 function loadImage(src: string): Promise<HTMLImageElement> {
@@ -109,19 +11,12 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-
-function wrapText(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxWidth: number,
-): string[] {
-  const paragraphs = text.split("\n");
+function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
   const lines: string[] = [];
-  for (const para of paragraphs) {
+  for (const para of text.split("\n")) {
     if (!para.trim()) { lines.push(""); continue; }
-    const words = para.split(" ");
     let line = "";
-    for (const word of words) {
+    for (const word of para.split(" ")) {
       const test = line ? line + " " + word : word;
       if (ctx.measureText(test).width > maxWidth && line) {
         lines.push(line);
@@ -135,10 +30,7 @@ function wrapText(
   return lines;
 }
 
-function rrect(
-  ctx: CanvasRenderingContext2D,
-  x: number, y: number, w: number, h: number, r: number,
-) {
+function rrect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
   ctx.moveTo(x + r, y);
   ctx.lineTo(x + w - r, y);
@@ -152,10 +44,16 @@ function rrect(
   ctx.closePath();
 }
 
+function decodePhoto(photo: string): string {
+  if (photo.startsWith("http") || photo.startsWith("data:")) return photo;
+  const b64 = photo.replace(/-/g, "+").replace(/_/g, "/");
+  return `data:image/jpeg;base64,${b64 + "=".repeat((4 - (b64.length % 4)) % 4)}`;
+}
+
 /* ─── Card dimensions ────────────────────────────────────────────────── */
 
-const CW = 1400; // logical width
-const CH = 900;  // logical height
+const CW = 1080; // canvas logical width
+const CH = 1350; // canvas logical height
 
 /* ─── Main renderer ──────────────────────────────────────────────────── */
 
@@ -171,220 +69,213 @@ export async function renderGreetingCard(
   const ctx = canvas.getContext("2d")!;
   ctx.scale(2, 2);
 
-  const cfg = CONFIGS[wish.type] ?? DEFAULT_CONFIG;
-  const cx = CW / 2;
+  const isFD = wish.type === "fathers-day";
   const SERIF = "Georgia, serif";
   const SANS = "system-ui, sans-serif";
 
-  /* ── 1. Background ─────────────────────────────────────────────────── */
-  const bgGrad = ctx.createLinearGradient(0, 0, CW * 0.7, CH);
-  bgGrad.addColorStop(0, cfg.bg[0]);
-  bgGrad.addColorStop(0.55, cfg.bg[1]);
-  bgGrad.addColorStop(1, cfg.bg[2]);
-  ctx.fillStyle = bgGrad;
+  // Card geometry
+  const CP = 48; // padding from canvas edge to card
+  const CX = CP, CY = CP;
+  const CDW = CW - CP * 2; // 984
+  const CDH = CH - CP * 2; // 1254
+  const CR = 50;            // corner radius
+  const cx = CW / 2;        // horizontal centre
+
+  // Colours (approximate web card tokens)
+  const DARK   = "#281520";
+  const MUTED  = "#9C7A8E";
+  const PINK   = "#C83060";
+
+  /* ── 1. Page background (approximates --gradient-warm) ──────────────── */
+  ctx.fillStyle = "#FAF6F3";
   ctx.fillRect(0, 0, CW, CH);
 
-  /* ── 2. Noise texture ──────────────────────────────────────────────── */
-  for (let i = 0; i < 5000; i++) {
-    ctx.fillStyle = `rgba(0,0,0,${Math.random() * 0.045})`;
-    ctx.fillRect(Math.random() * CW, Math.random() * CH, 1, 1);
+  const g1 = ctx.createRadialGradient(CW * 0.88, -80, 0, CW * 0.88, -80, 700);
+  g1.addColorStop(0, "rgba(255,200,165,0.60)");
+  g1.addColorStop(1, "transparent");
+  ctx.fillStyle = g1;
+  ctx.fillRect(0, 0, CW, CH);
+
+  const g2 = ctx.createRadialGradient(-60, CH * 1.08, 0, -60, CH * 1.08, 700);
+  g2.addColorStop(0, "rgba(250,175,215,0.50)");
+  g2.addColorStop(1, "transparent");
+  ctx.fillStyle = g2;
+  ctx.fillRect(0, 0, CW, CH);
+
+  /* ── 2. Card shadow + white background ──────────────────────────────── */
+  ctx.save();
+  ctx.shadowColor = "rgba(160,40,100,0.18)";
+  ctx.shadowBlur   = 55;
+  ctx.shadowOffsetY = 16;
+  rrect(ctx, CX, CY, CDW, CDH, CR);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fill();
+  ctx.restore();
+
+  ctx.save();
+  rrect(ctx, CX, CY, CDW, CDH, CR);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fill();
+  ctx.restore();
+
+  /* ── 3. Father's Day blurred photo background ───────────────────────── */
+  // The photo zone covers the top 55% of the card (same as CSS maskImage fade).
+  // White gradient overlay fades from transparent at 25% to opaque at 55%.
+  const PHOTO_H = Math.round(CDH * 0.55); // 690 px
+
+  if (photo && isFD) {
+    try {
+      const photoImg = await loadImage(decodePhoto(photo));
+      ctx.save();
+
+      // Clip to top of card, rounded at top corners only
+      ctx.beginPath();
+      ctx.moveTo(CX + CR, CY);
+      ctx.lineTo(CX + CDW - CR, CY);
+      ctx.quadraticCurveTo(CX + CDW, CY, CX + CDW, CY + CR);
+      ctx.lineTo(CX + CDW, CY + PHOTO_H);
+      ctx.lineTo(CX, CY + PHOTO_H);
+      ctx.lineTo(CX, CY + CR);
+      ctx.quadraticCurveTo(CX, CY, CX + CR, CY);
+      ctx.closePath();
+      ctx.clip();
+
+      // Draw blurred photo, cover-fitted, respecting photoY
+      ctx.filter = "blur(4px)";
+      ctx.globalAlpha = 0.6;
+      const { width: iw, height: ih } = photoImg;
+      const scale = Math.max(CDW / iw, PHOTO_H / ih);
+      const sw = iw * scale, sh = ih * scale;
+      const drawX = CX + (CDW - sw) / 2;
+      const photoYFrac = (wish.photoY ?? 0) / 100;
+      const drawY = CY + (PHOTO_H - sh) * photoYFrac; // cover-position matching CSS background-position
+      ctx.drawImage(photoImg, drawX, drawY, sw, sh);
+      ctx.filter = "none";
+      ctx.globalAlpha = 1;
+
+      // Fade to white (transparent at ~25% card height, opaque at 55%)
+      const fade = ctx.createLinearGradient(0, CY, 0, CY + PHOTO_H);
+      fade.addColorStop(0,    "rgba(255,255,255,0)");
+      fade.addColorStop(0.45, "rgba(255,255,255,0)");
+      fade.addColorStop(1,    "rgba(255,255,255,0.98)");
+      ctx.fillStyle = fade;
+      ctx.fillRect(CX, CY, CDW, PHOTO_H);
+
+      ctx.restore();
+    } catch { /* photo failed — skip */ }
   }
 
-  /* ── 3. Background scattered emoji ────────────────────────────────── */
-  const scatterPositions = [
-    [0.06, 0.09], [0.16, 0.80], [0.94, 0.07], [0.87, 0.90],
-    [0.50, 0.03], [0.28, 0.94], [0.72, 0.92], [0.04, 0.52],
-    [0.96, 0.50], [0.11, 0.36], [0.89, 0.28], [0.42, 0.06],
-    [0.62, 0.96], [0.20, 0.62], [0.80, 0.68],
-  ] as [number, number][];
-
-  ctx.save();
-  ctx.globalAlpha = 0.11;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  scatterPositions.forEach(([rx, ry], i) => {
-    const sz = [28, 22, 18, 24, 20][i % 5];
-    ctx.font = `${sz}px serif`;
-    ctx.fillText(cfg.scatter[i % cfg.scatter.length], rx * CW, ry * CH);
-  });
-  ctx.globalAlpha = 1;
-  ctx.restore();
-
-  /* ── 4. Outer border ──────────────────────────────────────────────── */
-  const pad = 28;
-  ctx.save();
-  ctx.strokeStyle = cfg.frame;
-  ctx.lineWidth = 2.5;
-  ctx.globalAlpha = 0.45;
-  rrect(ctx, pad, pad, CW - pad * 2, CH - pad * 2, 20);
-  ctx.stroke();
-  ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.2;
-  rrect(ctx, pad + 10, pad + 10, CW - (pad + 10) * 2, CH - (pad + 10) * 2, 14);
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.restore();
-
-  /* ── 5. Corner emoji ──────────────────────────────────────────────── */
-  ctx.font = "38px serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  const c = cfg.cornerEmoji;
-  ctx.fillText(c[0], 66, 66);
-  ctx.fillText(c[1], CW - 66, 66);
-  ctx.fillText(c[2], 66, CH - 66);
-  ctx.fillText(c[3], CW - 66, CH - 66);
-
-  /* ── 6. Left accent stripe ──────────────────────────────────────────  */
-  ctx.save();
-  const stripeGrad = ctx.createLinearGradient(0, 0, 180, 0);
-  stripeGrad.addColorStop(0, cfg.frame + "28");
-  stripeGrad.addColorStop(1, "transparent");
-  ctx.fillStyle = stripeGrad;
-  ctx.fillRect(pad + 2, pad + 2, 180, CH - (pad + 2) * 2);
-  ctx.restore();
-
-  /* ── 6.5. Photo portrait (optional) ─────────────────────────────── */
-  if (photo) {
+  /* ── 4. Non-FD photo circle (top-right corner of card) ─────────────── */
+  if (photo && !isFD) {
     try {
-      const photoSrc = (() => {
-        if (photo.startsWith("http") || photo.startsWith("data:")) return photo;
-        const b64 = photo.replace(/-/g, "+").replace(/_/g, "/");
-        const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
-        return `data:image/jpeg;base64,${padded}`;
-      })();
-      const photoImg = await loadImage(photoSrc);
-      const pr = 65;
-      const px = CW - 160;
-      const py = 165;
-
-      /* drop shadow */
+      const photoImg = await loadImage(decodePhoto(photo));
+      const pr = 46, px = CX + CDW - 76, py = CY + 76;
       ctx.save();
-      ctx.beginPath();
-      ctx.arc(px, py, pr + 8, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(0,0,0,0.12)";
-      ctx.fill();
-
-      /* outer decorative ring */
-      ctx.beginPath();
-      ctx.arc(px, py, pr + 7, 0, Math.PI * 2);
-      ctx.strokeStyle = cfg.frame;
-      ctx.lineWidth = 1;
-      ctx.globalAlpha = 0.25;
-      ctx.stroke();
-
-      /* clip + draw image */
       ctx.beginPath();
       ctx.arc(px, py, pr, 0, Math.PI * 2);
       ctx.clip();
       const { width: iw, height: ih } = photoImg;
       const scale = Math.max((pr * 2) / iw, (pr * 2) / ih);
-      const sw = iw * scale;
-      const sh = ih * scale;
-      ctx.globalAlpha = 1;
+      const sw = iw * scale, sh = ih * scale;
       ctx.drawImage(photoImg, px - sw / 2, py - sh / 2, sw, sh);
       ctx.restore();
-
-      /* inner accent ring on top of image */
-      ctx.save();
       ctx.beginPath();
       ctx.arc(px, py, pr, 0, Math.PI * 2);
-      ctx.strokeStyle = cfg.frame;
-      ctx.lineWidth = 3;
-      ctx.globalAlpha = 0.75;
+      ctx.strokeStyle = PINK;
+      ctx.lineWidth = 2.5;
+      ctx.globalAlpha = 0.35;
       ctx.stroke();
       ctx.globalAlpha = 1;
-      ctx.restore();
-    } catch {
-      /* photo failed to load — skip silently */
-    }
+    } catch { /* photo failed — skip */ }
   }
 
-  /* ── 7. Emoji focal point ─────────────────────────────────────────── */
-  /* Glow halo */
-  const halo = ctx.createRadialGradient(cx, 144, 0, cx, 144, 72);
-  halo.addColorStop(0, cfg.frame + "30");
-  halo.addColorStop(1, "transparent");
-  ctx.fillStyle = halo;
-  ctx.beginPath();
-  ctx.arc(cx, 144, 72, 0, Math.PI * 2);
-  ctx.fill();
+  /* ── 5. Content (label → dear → message → from → tagline) ──────────── */
+  let curY = CY + 52;
 
-  ctx.font = "90px serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText(emoji, cx, 144);
+  // Emoji (non-FD only)
+  if (!isFD && emoji) {
+    ctx.font = "72px serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(emoji, cx, curY);
+    curY += 90;
+  }
 
-  /* ── 8. Occasion label ────────────────────────────────────────────── */
+  // Occasion label — small tracked caps
   ctx.save();
-  ctx.font = `700 11.5px ${SANS}`;
-  ctx.fillStyle = cfg.frame;
+  ctx.font = `600 13px ${SANS}`;
+  ctx.fillStyle = MUTED;
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
-  ctx.globalAlpha = 0.8;
-  // Letter-spacing workaround for canvas: space out manually
-  const label = occasionLabel.toUpperCase();
-  const spaced = label.split("").join("  ");
-  ctx.fillText(spaced, cx, 212);
-  ctx.globalAlpha = 1;
+  ctx.globalAlpha = 0.85;
+  ctx.fillText(occasionLabel.toUpperCase().split("").join("  "), cx, curY);
   ctx.restore();
+  curY += 36;
 
-  /* Ornament divider */
-  const divY = 245;
-  ctx.save();
-  ctx.strokeStyle = cfg.frame;
-  ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.3;
-  ctx.beginPath(); ctx.moveTo(cx - 170, divY); ctx.lineTo(cx - 36, divY); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(cx + 36, divY); ctx.lineTo(cx + 170, divY); ctx.stroke();
-  ctx.globalAlpha = 0.65;
-  ctx.restore();
-  ctx.font = "16px serif";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillStyle = cfg.frame;
-  ctx.fillText("✦", cx, divY);
-
-  /* ── 9. Content: Dear line ────────────────────────────────────────── */
-  let curY = 278;
-
+  // "Dear [name]," — name rendered in pink
   if (wish.to) {
-    ctx.font = `italic 50px ${SERIF}`;
-    ctx.fillStyle = cfg.titleColor;
-    ctx.textAlign = "center";
+    const fs = 60;
+    ctx.font = `italic ${fs}px ${SERIF}`;
     ctx.textBaseline = "top";
-    ctx.fillText(`Dear ${wish.to},`, cx, curY);
-    curY += 68;
+    const dW = ctx.measureText("Dear ").width;
+    const nW = ctx.measureText(wish.to).width;
+    const cW = ctx.measureText(",").width;
+    const startX = Math.max(CX + 20, (CW - dW - nW - cW) / 2);
+    ctx.textAlign = "left";
+    ctx.fillStyle = DARK;  ctx.fillText("Dear ", startX, curY);
+    ctx.fillStyle = PINK;  ctx.fillText(wish.to, startX + dW, curY);
+    ctx.fillStyle = DARK;  ctx.fillText(",", startX + dW + nW, curY);
+    curY += Math.round(fs * 1.25);
   }
 
-  /* ── 10. Message ─────────────────────────────────────────────────── */
+  // Message body
   if (wish.message) {
-    ctx.font = `400 23px ${SERIF}`;
-    ctx.fillStyle = cfg.bodyColor;
+    curY += 24;
+    const mfs = 26;
+    const lineH = Math.round(mfs * 1.6);
+    const maxW = CDW * 0.78;
+    ctx.font = `${mfs}px ${SERIF}`;
+    ctx.fillStyle = DARK;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-
-    const rawLines = wrapText(ctx, wish.message, 840);
-    const maxLines = 7;
-    const lines = rawLines.slice(0, maxLines);
-    if (rawLines.length > maxLines) {
-      lines[maxLines - 1] = lines[maxLines - 1].slice(0, -2).trimEnd() + "…";
-    }
-
-    lines.forEach((l, i) => ctx.fillText(l, cx, curY + i * 35));
-    curY += lines.length * 35 + 14;
+    ctx.globalAlpha = 0.92;
+    const lines = wrapText(ctx, wish.message, maxW);
+    const cap = 9;
+    const vis = lines.slice(0, cap);
+    if (lines.length > cap) vis[cap - 1] = vis[cap - 1].trimEnd().slice(0, -1) + "…";
+    vis.forEach((l, i) => ctx.fillText(l, cx, curY + i * lineH));
+    curY += vis.length * lineH;
+    ctx.globalAlpha = 1;
   }
 
-  /* ── 11. Sender ──────────────────────────────────────────────────── */
+  // "— with love, [from]"
   if (wish.from) {
-    const fromY = Math.max(curY + 10, CH - 148);
+    curY += 32;
     ctx.font = `italic 22px ${SERIF}`;
-    ctx.fillStyle = cfg.mutedColor;
+    ctx.fillStyle = MUTED;
     ctx.textAlign = "center";
     ctx.textBaseline = "top";
-    ctx.fillText(`— with love, ${wish.from}`, cx, fromY);
+    ctx.fillText(`— with love, ${wish.from}`, cx, curY);
+    curY += 34;
   }
 
+  // Divider + tagline
+  const divY = Math.max(curY + 40, CY + CDH - 88);
+  ctx.save();
+  ctx.strokeStyle = MUTED;
+  ctx.lineWidth = 0.8;
+  ctx.globalAlpha = 0.25;
+  ctx.beginPath();
+  ctx.moveTo(cx - 40, divY);
+  ctx.lineTo(cx + 40, divY);
+  ctx.stroke();
+  ctx.globalAlpha = 0.55;
+  ctx.font = `italic 15px ${SERIF}`;
+  ctx.fillStyle = MUTED;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  ctx.fillText("Jo dil mein hai, Kehdoo.", cx, divY + 14);
+  ctx.restore();
 }
 
 /* ─── Export helpers ─────────────────────────────────────────────────── */
