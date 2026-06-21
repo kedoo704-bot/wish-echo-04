@@ -55,6 +55,7 @@ export type WishPayload = {
   message: string;
   theme: string;
   bg: string;
+  photoY?: number;
 };
 
 export type Template = {

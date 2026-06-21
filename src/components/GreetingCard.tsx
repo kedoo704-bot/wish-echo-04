@@ -13,6 +13,7 @@ export function GreetingCard({
   message,
   photoSrc,
   bgPhotoSrc,
+  photoY = 0,
   revealed,
 }: {
   emoji: string;
@@ -22,6 +23,7 @@ export function GreetingCard({
   message: string;
   photoSrc?: string | null;
   bgPhotoSrc?: string | null;
+  photoY?: number;
   revealed: boolean;
 }) {
   return (
@@ -39,13 +41,12 @@ export function GreetingCard({
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
             style={{
-              opacity: 0.55,
+              opacity: 0.6,
               filter: "blur(0.5px) saturate(1.1)",
-              objectPosition: "center top",
-              maskImage: "radial-gradient(ellipse 100% 100% at 50% 10%, black 25%, transparent 70%)",
-              WebkitMaskImage: "radial-gradient(ellipse 100% 100% at 50% 10%, black 25%, transparent 70%)",
+              objectPosition: `center ${photoY}%`,
             }}
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/40 to-card/90" />
         </div>
       )}
 

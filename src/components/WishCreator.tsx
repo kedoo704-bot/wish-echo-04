@@ -109,9 +109,11 @@ export default function WishCreator() {
                 from={creator.from}
                 message={creator.message}
                 photo={creator.photo}
+                photoY={creator.photoY}
                 to={creator.to}
                 type={creator.type}
                 onBgChange={creator.setBg}
+                onPhotoYChange={creator.setPhotoY}
               />
             )}
           </div>

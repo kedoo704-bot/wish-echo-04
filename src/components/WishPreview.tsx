@@ -8,6 +8,7 @@ type Props = {
   bg: string;
   theme: string;
   photo?: string;
+  photoY?: number;
 };
 
 const BG_EMOJI: Record<string, string[]> = {
@@ -26,7 +27,7 @@ const DECOR_POSITIONS = [
   { left: "16%", top: "32%", size: 20 },
 ];
 
-export function WishPreview({ type, to, from, message, bg, photo }: Props) {
+export function WishPreview({ type, to, from, message, bg, photo, photoY = 0 }: Props) {
   const t = MESSAGE_TYPES.find((m) => m.id === type) ?? MESSAGE_TYPES[0];
   const emojis = BG_EMOJI[bg] ?? [];
   return (
@@ -55,13 +56,12 @@ export function WishPreview({ type, to, from, message, bg, photo }: Props) {
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
             style={{
-              opacity: 0.55,
+              opacity: 0.6,
               filter: "blur(0.5px) saturate(1.1)",
-              objectPosition: "center top",
-              maskImage: "radial-gradient(ellipse 100% 100% at 50% 10%, black 25%, transparent 70%)",
-              WebkitMaskImage: "radial-gradient(ellipse 100% 100% at 50% 10%, black 25%, transparent 70%)",
+              objectPosition: `center ${photoY}%`,
             }}
           />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/40 to-card/90" />
         </div>
       ) : photo ? (
         <div className="absolute right-4 top-4 z-20 h-14 w-14 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-lg">

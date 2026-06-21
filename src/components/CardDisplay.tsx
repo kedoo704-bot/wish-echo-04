@@ -205,6 +205,7 @@ export default function CardDisplay({ card }: { card: CardRow }) {
               message={wish.message}
               photoSrc={isFathersDay ? null : photoUrl}
               bgPhotoSrc={isFathersDay ? photoUrl : null}
+              photoY={wish.photoY ?? 0}
               revealed={revealed}
             />
           </div>

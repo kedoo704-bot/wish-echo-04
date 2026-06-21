@@ -35,6 +35,7 @@ export function useWishCreator() {
   const [bg, setBg] = useState(BACKGROUNDS[0].id);
   const [photo, setPhoto] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoY, setPhotoY] = useState(0);
   const [saving, setSaving] = useState(false);
   const [savingLabel, setSavingLabel] = useState("Creating your card");
   const [notice, setNotice] = useState("");
@@ -98,8 +99,9 @@ export function useWishCreator() {
       message: (message || `${currentType.emoji} ${currentType.label}`).trim(),
       theme: "Elegant",
       bg,
+      ...(type === "fathers-day" ? { photoY } : {}),
     }),
-    [bg, currentType.emoji, currentType.label, from, message, to, type]
+    [bg, currentType.emoji, currentType.label, from, message, to, type, photoY]
   );
 
   const setTo = (value: string) => setToRaw(value.slice(0, MAX_NAME_LENGTH));
@@ -123,6 +125,7 @@ export function useWishCreator() {
     setSelectedTemplateId(null);
     setMessageRaw("");
     setNotice("");
+    setPhotoY(0);
     pushStep(1);
   };
 
@@ -217,6 +220,7 @@ export function useWishCreator() {
     message,
     notice,
     photo,
+    photoY,
     removePhoto,
     saving,
     savingLabel,
@@ -226,6 +230,7 @@ export function useWishCreator() {
     setBg,
     setFrom,
     setMessage,
+    setPhotoY,
     setTo,
     step,
     submit,
