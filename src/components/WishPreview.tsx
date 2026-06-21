@@ -50,18 +50,18 @@ export function WishPreview({ type, to, from, message, bg, photo, photoY = 0 }: 
         </span>
       ))}
       {photo && type === "fathers-day" ? (
-        <div aria-hidden className="absolute inset-0 z-0 overflow-hidden rounded-[2rem]">
+        <div aria-hidden className="absolute inset-x-0 top-0 z-0 h-[55%]">
           <img
             src={photo}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover"
+            className="h-full w-full object-cover"
             style={{
-              opacity: 0.5,
+              opacity: 0.6,
               filter: "blur(0.5px) saturate(1.1)",
               objectPosition: `center ${photoY}%`,
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-card/20 via-card/60 to-card/93" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/30 to-card" />
         </div>
       ) : photo ? (
         <div className="absolute right-4 top-4 z-20 h-14 w-14 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-lg">
