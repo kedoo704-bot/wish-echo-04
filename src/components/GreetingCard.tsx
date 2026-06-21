@@ -1,6 +1,9 @@
 /**
  * The greeting card surface shared by saved-card views and previews.
  * Purely presentational.
+ *
+ * bgPhotoSrc (Father's Day only): renders the photo as a subtle blurred
+ * background layer instead of the standard top-right circle.
  */
 export function GreetingCard({
   emoji,
@@ -9,6 +12,7 @@ export function GreetingCard({
   from,
   message,
   photoSrc,
+  bgPhotoSrc,
   revealed,
 }: {
   emoji: string;
@@ -17,6 +21,7 @@ export function GreetingCard({
   from?: string;
   message: string;
   photoSrc?: string | null;
+  bgPhotoSrc?: string | null;
   revealed: boolean;
 }) {
   return (
@@ -26,11 +31,26 @@ export function GreetingCard({
       }`}
       style={{ boxShadow: "var(--shadow-soft)" }}
     >
-      {photoSrc && (
+      {/* Background photo layer — Father's Day only, very subtle */}
+      {bgPhotoSrc && (
+        <div aria-hidden className="absolute inset-0 overflow-hidden rounded-[2.5rem]">
+          <img
+            src={bgPhotoSrc}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ opacity: 0.15, filter: "blur(2px) saturate(1.0)" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-card/70 to-card/85" />
+        </div>
+      )}
+
+      {/* Standard photo circle — only when not using background mode */}
+      {photoSrc && !bgPhotoSrc && (
         <div className="greeting-card-item absolute right-6 top-6 h-20 w-20 overflow-hidden rounded-full ring-[3px] ring-primary/30 shadow-xl">
           <img src={photoSrc} alt="" className="h-full w-full object-cover" />
         </div>
       )}
+
       <div
         aria-hidden="true"
         className="greeting-card-item greeting-card-emoji"

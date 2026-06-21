@@ -476,20 +476,30 @@ body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }
   will-change: transform, opacity;
 }
 
-/* Envelope exits downward after card is fully out */
+/* Idle: envelope body gently floats while waiting for tap */
+.envelope-scene.is-idle .envelope-body {
+  animation: fd-envelope-float 3.2s ease-in-out infinite;
+}
+
+/* Stage 1: flap opens with paper-hinge physics */
+.envelope-flap.is-open {
+  animation: fd-flap-open 600ms cubic-bezier(0.25, 0.8, 0.25, 1) both;
+}
+
+/* Stage 1: card teaser rises — 320ms delay so flap opens first */
+.envelope-card-teaser.is-rising {
+  animation: fd-teaser-rise 560ms 320ms cubic-bezier(0.22, 1.05, 0.36, 1) both;
+}
+
+/* Stage 2: envelope falls away with gravity */
 .envelope-scene.is-exiting {
   pointer-events: none;
-  animation: envelope-scene-exit 550ms cubic-bezier(0.4, 0, 1, 1) both;
+  animation: fd-envelope-fall 580ms cubic-bezier(0.4, 0, 0.9, 1) both;
 }
 
-/* Teaser rises with 280ms delay so flap opens first */
-.envelope-card-teaser.is-rising {
-  animation: teaser-card-rise 520ms 280ms cubic-bezier(0.22, 1.08, 0.34, 1) both;
-}
-
-/* Father's Day: card flips open to reveal content */
+/* Stage 2: card flips open — book-open sensation */
 .fd-card-flip-in {
-  animation: fd-card-flip-in 700ms cubic-bezier(0.2, 0.82, 0.2, 1) both;
+  animation: fd-card-open 750ms cubic-bezier(0.2, 0.85, 0.2, 1) both;
 }
 
 .fd-card-shown {
@@ -595,31 +605,43 @@ body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }
   50%       { opacity: 1; transform: scaleY(1); }
 }
 
-/* ── Envelope / Father's Day keyframes ──────────────────────── */
-@keyframes envelope-flap-open {
-  0%   { transform: perspective(600px) rotateX(0deg); opacity: 1; }
-  65%  { transform: perspective(600px) rotateX(-155deg); opacity: 1; }
-  100% { transform: perspective(600px) rotateX(-170deg); opacity: 0.85; }
+/* ── Father's Day keyframes (consistent 800px perspective throughout) ── */
+
+/* Idle: envelope breathes gently while waiting */
+@keyframes fd-envelope-float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-6px); }
 }
 
-/* Stage 1: card rises out of envelope */
-@keyframes teaser-card-rise {
-  0%   { transform: translateY(-40%); opacity: 1; }
-  75%  { transform: translateY(calc(-40% - 160px)) scale(1.04); opacity: 1; }
-  100% { transform: translateY(calc(-40% - 150px)) scale(1.02); opacity: 0; }
+/* Stage 1: flap opens — realistic paper hinge (slow inertia start) */
+@keyframes fd-flap-open {
+  0%   { transform: perspective(800px) rotateX(0deg); opacity: 1; }
+  18%  { transform: perspective(800px) rotateX(-15deg); opacity: 1; }
+  80%  { transform: perspective(800px) rotateX(-172deg); opacity: 1; }
+  100% { transform: perspective(800px) rotateX(-165deg); opacity: 0; }
 }
 
-/* Stage 3: envelope closes — slides down and fades */
-@keyframes envelope-scene-exit {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(70px) scale(0.94); }
+/* Stage 1: card rises with slight rotation (realistic extraction) */
+@keyframes fd-teaser-rise {
+  0%   { transform: translateY(-38%) rotate(0deg); opacity: 1; }
+  15%  { transform: translateY(-46%) rotate(-1.5deg); opacity: 1; }
+  78%  { transform: translateY(calc(-38% - 165px)) rotate(1deg) scale(1.02); opacity: 1; }
+  100% { transform: translateY(calc(-38% - 155px)) rotate(0deg) scale(1); opacity: 0; }
 }
 
-/* Stage 2: card flips open to reveal content (like opening a card) */
-@keyframes fd-card-flip-in {
-  0%   { opacity: 0; transform: perspective(1200px) rotateY(90deg) scale(0.96); }
-  35%  { opacity: 1; }
-  100% { opacity: 1; transform: perspective(1200px) rotateY(0deg) scale(1); }
+/* Stage 2: card opens like a greeting card (rotateY with spring overshoot) */
+@keyframes fd-card-open {
+  0%   { opacity: 0; transform: perspective(800px) rotateY(40deg) scale(0.9) translateY(18px); }
+  28%  { opacity: 1; }
+  72%  { transform: perspective(800px) rotateY(-4deg) scale(1.01) translateY(-3px); }
+  100% { opacity: 1; transform: perspective(800px) rotateY(0deg) scale(1) translateY(0); }
+}
+
+/* Stage 2: envelope falls away — gravity accelerates departure */
+@keyframes fd-envelope-fall {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  20%  { opacity: 0.9; transform: translateY(8px) scale(0.99); }
+  100% { opacity: 0; transform: translateY(100px) scale(0.87); }
 }
 
 @keyframes envelope-prompt-pulse {

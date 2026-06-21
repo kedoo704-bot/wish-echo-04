@@ -129,15 +129,15 @@ export default function CardDisplay({ card }: { card: CardRow }) {
   };
 
   // Father's Day: 3-stage reveal
-  // t=0    → opening  (flap opens 420ms, card rises 520ms with 280ms delay)
-  // t=900  → revealing (card flips in 700ms, envelope exits 550ms)
-  // t=1650 → revealed
+  // t=0    → opening  (flap opens 600ms, card teaser rises 560ms with 320ms delay)
+  // t=1000 → revealing (card flips in 750ms, envelope falls away 580ms)
+  // t=1800 → revealed
   const unwrapFD = async () => {
     if (fdPhase !== "idle") return;
     setFdPhase("opening");
     await startAudio();
-    window.setTimeout(() => setFdPhase("revealing"), 900);
-    window.setTimeout(() => setFdPhase("revealed"), 1650);
+    window.setTimeout(() => setFdPhase("revealing"), 1000);
+    window.setTimeout(() => setFdPhase("revealed"), 1800);
   };
 
   // Standard: original "tap & unwrap" cover
@@ -215,7 +215,7 @@ export default function CardDisplay({ card }: { card: CardRow }) {
               {/* ── Father's Day: Envelope scene ── */}
               {fdPhase !== "revealed" && (
                 <div
-                  className={`envelope-scene${fdPhase === "revealing" ? " is-exiting" : ""}`}
+                  className={`envelope-scene${fdPhase === "idle" ? " is-idle" : ""}${fdPhase === "revealing" ? " is-exiting" : ""}`}
                   onClick={unwrapFD}
                   onTouchStart={handleTouchStart}
                   onTouchEnd={handleTouchEndFD}
@@ -260,7 +260,8 @@ export default function CardDisplay({ card }: { card: CardRow }) {
                   to={wish.to}
                   from={wish.from}
                   message={wish.message}
-                  photoSrc={photoUrl}
+                  photoSrc={null}
+                  bgPhotoSrc={photoUrl}
                   revealed={fdPhase === "revealing" || fdPhase === "revealed"}
                 />
               </div>
