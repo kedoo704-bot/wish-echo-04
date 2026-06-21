@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronUp, Gift, Volume2, VolumeX } from "lucide-react";
+import { Gift, Volume2, VolumeX } from "lucide-react";
 import { MESSAGE_TYPES } from "@/lib/wish";
 import { WishBackground } from "@/components/WishBackground";
 import { GreetingCard } from "@/components/GreetingCard";
@@ -22,31 +22,17 @@ type AudioWindow = Window &
     webkitAudioContext?: typeof AudioContext;
   };
 
-// Father's Day: 3-stage envelope animation
-// Stage 1 "opening"  — flap opens, card rises out of envelope
-// Stage 2 "revealing" — card flips open to show content, envelope slides down and closes
-// Stage 3 "revealed"  — final state
-type FDPhase = "idle" | "opening" | "revealing" | "revealed";
-
 export default function CardDisplay({ card }: { card: CardRow }) {
   const wish = card.payload;
   const typeMeta = MESSAGE_TYPES.find((m) => m.id === wish.type) ?? MESSAGE_TYPES[0];
   const photoUrl = card.photo_path ? getPhotoUrl(card.photo_path) : null;
   const isFathersDay = wish.type === "fathers-day";
 
-  // Father's Day state
-  const [fdPhase, setFdPhase] = useState<FDPhase>("idle");
-
-  // Standard state (all other occasions — original experience)
   const [revealed, setRevealed] = useState(false);
   const [coverLeaving, setCoverLeaving] = useState(false);
-
   const [muted, setMuted] = useState(false);
   const audioRef = useRef<AudioState | null>(null);
   const mp3Ref = useRef<HTMLAudioElement | null>(null);
-  const touchStartY = useRef<number>(0);
-
-  const isRevealed = isFathersDay ? fdPhase === "revealed" : revealed;
 
   useEffect(() => {
     const viewKey = `kehdoo:viewed:${card.id}`;
@@ -74,7 +60,6 @@ export default function CardDisplay({ card }: { card: CardRow }) {
       mp3Ref.current.currentTime = 0;
       mp3Ref.current = null;
     }
-
     const state = audioRef.current;
     if (!state) return;
     window.clearInterval(state.timer);
@@ -82,10 +67,7 @@ export default function CardDisplay({ card }: { card: CardRow }) {
     state.gain.gain.cancelScheduledValues(now);
     state.gain.gain.setValueAtTime(Math.max(state.gain.gain.value, 0.0001), now);
     state.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
-    window.setTimeout(() => {
-      state.oscillator.stop();
-      state.context.close();
-    }, 560);
+    window.setTimeout(() => { state.oscillator.stop(); state.context.close(); }, 560);
     audioRef.current = null;
   };
 
@@ -128,32 +110,11 @@ export default function CardDisplay({ card }: { card: CardRow }) {
     setMuted(false);
   };
 
-  // Father's Day: 3-stage reveal
-  // t=0    → opening  (flap opens 600ms, card teaser rises 560ms with 320ms delay)
-  // t=1000 → revealing (card flips in 750ms, envelope falls away 580ms)
-  // t=1800 → revealed
-  const unwrapFD = async () => {
-    if (fdPhase !== "idle") return;
-    setFdPhase("opening");
-    await startAudio();
-    window.setTimeout(() => setFdPhase("revealing"), 1000);
-    window.setTimeout(() => setFdPhase("revealed"), 1800);
-  };
-
-  // Standard: original "tap & unwrap" cover
   const unwrap = async () => {
     if (revealed || coverLeaving) return;
     setCoverLeaving(true);
     await startAudio();
     window.setTimeout(() => setRevealed(true), 680);
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleTouchEndFD = (e: React.TouchEvent) => {
-    if (touchStartY.current - e.changedTouches[0].clientY > 40) unwrapFD();
   };
 
   const toggleAudio = () => {
@@ -164,7 +125,6 @@ export default function CardDisplay({ card }: { card: CardRow }) {
       else        { mp3.volume = 0;    setMuted(true); }
       return;
     }
-
     const state = audioRef.current;
     if (!state) return;
     const now = state.context.currentTime;
@@ -180,10 +140,7 @@ export default function CardDisplay({ card }: { card: CardRow }) {
     }
   };
 
-  const startClean = () => {
-    stopAudio();
-    window.location.assign("/");
-  };
+  const startClean = () => { stopAudio(); window.location.assign("/"); };
 
   return (
     <main className="relative min-h-[100dvh] overflow-hidden px-5 pb-28 pt-20 md:px-8 md:pb-32 md:pt-24">
@@ -194,7 +151,7 @@ export default function CardDisplay({ card }: { card: CardRow }) {
           <div className="inline-flex rounded-full border border-white/60 bg-background/82 px-3.5 py-2 shadow-lg backdrop-blur-xl">
             <BrandLogo className="h-8 w-auto max-w-[128px] object-contain" priority />
           </div>
-          {isRevealed && (audioRef.current || mp3Ref.current) && (
+          {revealed && (audioRef.current || mp3Ref.current) && (
             <button
               type="button"
               onClick={toggleAudio}
@@ -209,113 +166,51 @@ export default function CardDisplay({ card }: { card: CardRow }) {
 
       <div className="relative z-10 mx-auto flex min-h-[calc(100dvh-12rem)] w-full max-w-2xl flex-col justify-center gap-5">
         <section className="recipient-stage relative">
-
-          {isFathersDay ? (
-            <>
-              {/* ── Father's Day: Envelope scene ── */}
-              {fdPhase !== "revealed" && (
-                <div
-                  className={`envelope-scene${fdPhase === "idle" ? " is-idle" : ""}${fdPhase === "revealing" ? " is-exiting" : ""}`}
-                  onClick={unwrapFD}
-                  onTouchStart={handleTouchStart}
-                  onTouchEnd={handleTouchEndFD}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && unwrapFD()}
-                  aria-label="Open the envelope"
-                  style={{ touchAction: "none" }}
-                >
-                  <div className="envelope-body">
-                    <div className="envelope-interior" />
-                    <div className="envelope-fold-bottom" />
-                    <div className="envelope-fold-left" />
-                    <div className="envelope-fold-right" />
-                    <div className={`envelope-flap${fdPhase !== "idle" ? " is-open" : ""}`} />
-                    <div className={`envelope-card-teaser${fdPhase === "opening" ? " is-rising" : ""}`}>
-                      <span className="teaser-emoji">{typeMeta.emoji}</span>
-                      <span className="teaser-label">{typeMeta.label}</span>
-                      {wish.to && <span className="teaser-to">Dear {wish.to}</span>}
-                    </div>
-                  </div>
-                  {fdPhase === "idle" && (
-                    <div className="envelope-prompt">
-                      <ChevronUp className="envelope-prompt-icon" />
-                      <span>Swipe up or tap to open</span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* ── Father's Day: Card content (flip in, then static) ── */}
-              <div
-                className={
-                  fdPhase === "revealing" ? "fd-card-flip-in" :
-                  fdPhase === "revealed"  ? "fd-card-shown" :
-                  "pointer-events-none opacity-0"
-                }
-              >
-                <GreetingCard
-                  emoji={typeMeta.emoji}
-                  label={typeMeta.label}
-                  to={wish.to}
-                  from={wish.from}
-                  message={wish.message}
-                  photoSrc={null}
-                  bgPhotoSrc={photoUrl}
-                  revealed={fdPhase === "revealing" || fdPhase === "revealed"}
-                />
-              </div>
-            </>
-          ) : (
-            <>
-              {/* ── Standard: original gradient cover ── */}
-              {!revealed && (
-                <button
-                  type="button"
-                  onClick={unwrap}
-                  className={`recipient-cover touch-card${coverLeaving ? " is-leaving" : ""}`}
-                  aria-label="Tap and unwrap the greeting"
-                >
-                  <span className="recipient-glow recipient-glow-one" />
-                  <span className="recipient-glow recipient-glow-two" />
-                  <span className="recipient-cover-inner">
-                    <span className="grid h-16 w-16 place-items-center rounded-3xl bg-white/18 text-white shadow-2xl backdrop-blur-md">
-                      <Gift className="h-8 w-8 animate-gift-bounce" />
-                    </span>
-                    <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70">
-                      A Kehdoo for you
-                    </span>
-                    <span className="font-serif text-[clamp(2.6rem,14cqw,5.4rem)] leading-[0.92] text-white">
-                      Open this feeling
-                    </span>
-                    <span className="max-w-[25rem] text-sm leading-6 text-white/78">
-                      A little message is waiting behind the sleeve.
-                    </span>
-                    <span className="recipient-pulse-line" />
-                    <span className="rounded-full bg-white px-5 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-primary shadow-xl">
-                      Tap & unwrap
-                    </span>
-                  </span>
-                </button>
-              )}
-
-              {/* ── Standard: card reveal ── */}
-              <div className={revealed ? "recipient-card-unwrapped" : "pointer-events-none opacity-0"}>
-                <GreetingCard
-                  emoji={typeMeta.emoji}
-                  label={typeMeta.label}
-                  to={wish.to}
-                  from={wish.from}
-                  message={wish.message}
-                  photoSrc={photoUrl}
-                  revealed={revealed}
-                />
-              </div>
-            </>
+          {!revealed && (
+            <button
+              type="button"
+              onClick={unwrap}
+              className={`recipient-cover touch-card${coverLeaving ? " is-leaving" : ""}`}
+              aria-label="Tap and unwrap the greeting"
+            >
+              <span className="recipient-glow recipient-glow-one" />
+              <span className="recipient-glow recipient-glow-two" />
+              <span className="recipient-cover-inner">
+                <span className="grid h-16 w-16 place-items-center rounded-3xl bg-white/18 text-white shadow-2xl backdrop-blur-md">
+                  <Gift className="h-8 w-8 animate-gift-bounce" />
+                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.32em] text-white/70">
+                  A Kehdoo for you
+                </span>
+                <span className="font-serif text-[clamp(2.6rem,14cqw,5.4rem)] leading-[0.92] text-white">
+                  Open this feeling
+                </span>
+                <span className="max-w-[25rem] text-sm leading-6 text-white/78">
+                  A little message is waiting behind the sleeve.
+                </span>
+                <span className="recipient-pulse-line" />
+                <span className="rounded-full bg-white px-5 py-3 text-[11px] font-bold uppercase tracking-[0.22em] text-primary shadow-xl">
+                  Tap & unwrap
+                </span>
+              </span>
+            </button>
           )}
+
+          <div className={revealed ? "recipient-card-unwrapped" : "pointer-events-none opacity-0"}>
+            <GreetingCard
+              emoji={typeMeta.emoji}
+              label={typeMeta.label}
+              to={wish.to}
+              from={wish.from}
+              message={wish.message}
+              photoSrc={isFathersDay ? null : photoUrl}
+              bgPhotoSrc={isFathersDay ? photoUrl : null}
+              revealed={revealed}
+            />
+          </div>
         </section>
 
-        {isRevealed && (
+        {revealed && (
           <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
             <section className="recipient-love-strip mx-auto flex max-w-2xl items-center gap-3">
               <div className="min-w-0 flex-1">

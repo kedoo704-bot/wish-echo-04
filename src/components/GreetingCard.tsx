@@ -38,7 +38,7 @@ export function GreetingCard({
             src={bgPhotoSrc}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
-            style={{ opacity: 0.15, filter: "blur(2px) saturate(1.0)" }}
+            style={{ opacity: 0.38, filter: "blur(1px) saturate(1.1)" }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-card/70 to-card/85" />
         </div>

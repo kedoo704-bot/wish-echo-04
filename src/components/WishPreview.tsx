@@ -48,11 +48,21 @@ export function WishPreview({ type, to, from, message, bg, photo }: Props) {
           {e}
         </span>
       ))}
-      {photo && (
+      {photo && type === "fathers-day" ? (
+        <div aria-hidden className="absolute inset-0 z-0 overflow-hidden rounded-[2rem]">
+          <img
+            src={photo}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+            style={{ opacity: 0.38, filter: "blur(1px) saturate(1.1)" }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-card/75 via-card/65 to-card/80" />
+        </div>
+      ) : photo ? (
         <div className="absolute right-4 top-4 z-20 h-14 w-14 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-lg">
           <img src={photo} alt="" className="h-full w-full object-cover" />
         </div>
-      )}
+      ) : null}
       <div className="relative z-10 px-7 py-10 text-center md:px-10 md:py-14">
         <div aria-hidden="true" className="text-5xl md:text-6xl" style={{ animation: "floaty 5s ease-in-out infinite" }}>{t.emoji}</div>
         <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">{t.label}</p>
