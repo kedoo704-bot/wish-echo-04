@@ -119,9 +119,9 @@ export async function renderGreetingCard(
   ctx.restore();
 
   /* ── 3. Father's Day blurred photo background ───────────────────────── */
-  // The photo zone covers the top 55% of the card (same as CSS maskImage fade).
-  // White gradient overlay fades from transparent at 25% to opaque at 55%.
-  const PHOTO_H = Math.round(CDH * 0.55); // 690 px
+  // Photo zone: top 42% of card. Fully visible 0-20%, fading 20-42%.
+  // Matches CSS: opacity 0.45, blur 8px, maskImage black 20% → transparent 42%.
+  const PHOTO_H = Math.round(CDH * 0.42); // 527 px
 
   if (photo && isFD) {
     try {
@@ -141,8 +141,8 @@ export async function renderGreetingCard(
       ctx.clip();
 
       // Draw blurred photo, cover-fitted, respecting photoY
-      ctx.filter = "blur(4px)";
-      ctx.globalAlpha = 0.6;
+      ctx.filter = "blur(8px)";
+      ctx.globalAlpha = 0.45;
       const { width: iw, height: ih } = photoImg;
       const scale = Math.max(CDW / iw, PHOTO_H / ih);
       const sw = iw * scale, sh = ih * scale;
@@ -153,10 +153,10 @@ export async function renderGreetingCard(
       ctx.filter = "none";
       ctx.globalAlpha = 1;
 
-      // Fade to white (transparent at ~25% card height, opaque at 55%)
+      // Fade to white: visible 0-20% of card, fading 20-42% of card
       const fade = ctx.createLinearGradient(0, CY, 0, CY + PHOTO_H);
       fade.addColorStop(0,    "rgba(255,255,255,0)");
-      fade.addColorStop(0.45, "rgba(255,255,255,0)");
+      fade.addColorStop(0.48, "rgba(255,255,255,0)"); // 20% of card / 42% zone = 0.48
       fade.addColorStop(1,    "rgba(255,255,255,0.98)");
       ctx.fillStyle = fade;
       ctx.fillRect(CX, CY, CDW, PHOTO_H);
