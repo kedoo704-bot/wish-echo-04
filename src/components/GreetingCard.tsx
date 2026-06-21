@@ -42,8 +42,8 @@ export function GreetingCard({
               opacity: 0.55,
               filter: "blur(0.5px) saturate(1.1)",
               objectPosition: "center top",
-              maskImage: "radial-gradient(ellipse 85% 75% at 50% 35%, black 30%, transparent 75%)",
-              WebkitMaskImage: "radial-gradient(ellipse 85% 75% at 50% 35%, black 30%, transparent 75%)",
+              maskImage: "radial-gradient(ellipse 100% 100% at 50% 10%, black 25%, transparent 70%)",
+              WebkitMaskImage: "radial-gradient(ellipse 100% 100% at 50% 10%, black 25%, transparent 70%)",
             }}
           />
         </div>
