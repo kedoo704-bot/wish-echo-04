@@ -36,14 +36,15 @@ export function GreetingCard({
       {/* Background photo layer — Father's Day only, very subtle */}
       {bgPhotoSrc && (
         <div aria-hidden className="absolute inset-x-0 top-0 h-[55%]">
-          <img
-            src={bgPhotoSrc}
-            alt=""
-            className="h-full w-full object-cover"
+          <div
+            className="absolute inset-0"
             style={{
-              opacity: 0.6,
+              backgroundImage: `url(${bgPhotoSrc})`,
+              backgroundSize: "auto 150%",
+              backgroundPosition: `center ${photoY}%`,
+              backgroundRepeat: "no-repeat",
+              opacity: 0.65,
               filter: "blur(0.5px) saturate(1.1)",
-              objectPosition: `center ${photoY}%`,
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/30 to-card" />

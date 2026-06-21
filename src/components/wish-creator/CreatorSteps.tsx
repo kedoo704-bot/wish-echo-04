@@ -330,31 +330,14 @@ export function PreviewStep({
           theme="Elegant"
           photo={photo ?? undefined}
           photoY={photoY}
+          onPhotoDrag={type === "fathers-day" && photo ? onPhotoYChange : undefined}
         />
       </div>
 
       {type === "fathers-day" && photo && (
-        <div className="mt-4 rounded-2xl border border-border/70 bg-card/80 px-4 py-3">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              Photo position
-            </span>
-            <span className="text-xs text-muted-foreground">drag to adjust</span>
-          </div>
-          <input
-            type="range"
-            min="0"
-            max="100"
-            value={photoY}
-            onChange={(e) => onPhotoYChange(Number(e.target.value))}
-            className="w-full cursor-pointer accent-primary"
-            aria-label="Adjust photo position"
-          />
-          <div className="mt-1 flex justify-between text-xs text-muted-foreground">
-            <span>Top</span>
-            <span>Bottom</span>
-          </div>
-        </div>
+        <p className="mt-2 text-center text-xs text-muted-foreground">
+          Drag the photo above to reposition it
+        </p>
       )}
     </div>
   );
