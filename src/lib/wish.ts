@@ -1,4 +1,6 @@
 export const MESSAGE_TYPES = [
+  { id: "fathers-day", label: "Happy Father's Day", emoji: "👨‍👧" },
+  { id: "anniversary", label: "Happy Anniversary", emoji: "💍" },
   { id: "thank-you", label: "Thank You", emoji: "💖" },
   { id: "sorry", label: "Sorry", emoji: "🌸" },
   { id: "good-morning", label: "Good Morning", emoji: "☀️" },
@@ -62,6 +64,40 @@ export type Template = {
 };
 
 export const MESSAGE_TEMPLATES: Record<string, Template[]> = {
+  "fathers-day": [
+    {
+      id: "fd-1",
+      label: "Heartfelt",
+      text: "Happy Father's Day! 👨‍👧 You've been my rock, my guide, and my biggest cheerleader. Thank you for everything you've done and everything you are. Love you so much.",
+    },
+    {
+      id: "fd-2",
+      label: "Warm & Fun",
+      text: "To the best dad ever — Happy Father's Day! 🎉 Thanks for all the advice, the dad jokes, and the unconditional love. Today we celebrate YOU. You deserve all of it!",
+    },
+    {
+      id: "fd-3",
+      label: "Reflective",
+      text: "On Father's Day, I just want to say: I see how hard you work, how much you give, and how deeply you love. I hope you know how appreciated and cherished you truly are. 💙",
+    },
+  ],
+  "anniversary": [
+    {
+      id: "an-1",
+      label: "Romantic",
+      text: "Happy Anniversary! 💍 Every year with you is a gift I never take for granted. You are my favourite person, my safe place, and my greatest adventure. Here's to forever. ❤️",
+    },
+    {
+      id: "an-2",
+      label: "Warm & Joyful",
+      text: "Can you believe it's been another year? 🥂 Time flies when you're with the right person. Happy Anniversary — I'd choose you all over again, every single time.",
+    },
+    {
+      id: "an-3",
+      label: "Heartfelt",
+      text: "Happy Anniversary! What we have is something truly special. Thank you for the love, the laughter, and the life we're building together. I love you more than words can say. 💞",
+    },
+  ],
   "thank-you": [
     {
       id: "ty-1",
