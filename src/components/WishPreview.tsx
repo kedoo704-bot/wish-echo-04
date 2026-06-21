@@ -56,12 +56,12 @@ export function WishPreview({ type, to, from, message, bg, photo, photoY = 0 }: 
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
             style={{
-              opacity: 0.6,
+              opacity: 0.5,
               filter: "blur(0.5px) saturate(1.1)",
               objectPosition: `center ${photoY}%`,
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/40 to-card/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-card/20 via-card/60 to-card/93" />
         </div>
       ) : photo ? (
         <div className="absolute right-4 top-4 z-20 h-14 w-14 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-lg">

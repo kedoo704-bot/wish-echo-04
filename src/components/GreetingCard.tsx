@@ -41,12 +41,12 @@ export function GreetingCard({
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
             style={{
-              opacity: 0.6,
+              opacity: 0.5,
               filter: "blur(0.5px) saturate(1.1)",
               objectPosition: `center ${photoY}%`,
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/40 to-card/90" />
+          <div className="absolute inset-0 bg-gradient-to-b from-card/20 via-card/60 to-card/93" />
         </div>
       )}
 
