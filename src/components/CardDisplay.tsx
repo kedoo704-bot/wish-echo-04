@@ -28,10 +28,12 @@ export default function CardDisplay({ card }: { card: CardRow }) {
   const wish = card.payload;
   const typeMeta = MESSAGE_TYPES.find((m) => m.id === wish.type) ?? MESSAGE_TYPES[0];
   const photoUrl = card.photo_path ? getPhotoUrl(card.photo_path) : null;
+  const isFathersDay = wish.type === "fathers-day";
 
   const [phase, setPhase] = useState<EnvelopePhase>("idle");
   const [muted, setMuted] = useState(false);
   const audioRef = useRef<AudioState | null>(null);
+  const mp3Ref = useRef<HTMLAudioElement | null>(null);
   const touchStartY = useRef<number>(0);
 
   useEffect(() => {
@@ -55,9 +57,16 @@ export default function CardDisplay({ card }: { card: CardRow }) {
   }, [card.id]);
 
   const stopAudio = () => {
+    // Stop MP3 (Father's Day)
+    if (mp3Ref.current) {
+      mp3Ref.current.pause();
+      mp3Ref.current.currentTime = 0;
+      mp3Ref.current = null;
+    }
+
+    // Stop chime (all others)
     const state = audioRef.current;
     if (!state) return;
-
     window.clearInterval(state.timer);
     const now = state.context.currentTime;
     state.gain.gain.cancelScheduledValues(now);
@@ -71,8 +80,18 @@ export default function CardDisplay({ card }: { card: CardRow }) {
   };
 
   const startAudio = async () => {
-    if (audioRef.current) return;
+    if (isFathersDay) {
+      if (mp3Ref.current) return;
+      const audio = new Audio("/papa_meri_jaan.mp3");
+      audio.loop = true;
+      audio.volume = 0.85;
+      mp3Ref.current = audio;
+      await audio.play().catch(() => {});
+      setMuted(false);
+      return;
+    }
 
+    if (audioRef.current) return;
     const audioWindow = window as AudioWindow;
     const AudioCtor = audioWindow.AudioContext || audioWindow.webkitAudioContext;
     if (!AudioCtor) return;
@@ -117,9 +136,21 @@ export default function CardDisplay({ card }: { card: CardRow }) {
   };
 
   const toggleAudio = () => {
+    if (isFathersDay) {
+      const mp3 = mp3Ref.current;
+      if (!mp3) return;
+      if (muted) {
+        mp3.volume = 0.85;
+        setMuted(false);
+      } else {
+        mp3.volume = 0;
+        setMuted(true);
+      }
+      return;
+    }
+
     const state = audioRef.current;
     if (!state) return;
-
     const now = state.context.currentTime;
     state.gain.gain.cancelScheduledValues(now);
     if (muted) {
@@ -128,7 +159,6 @@ export default function CardDisplay({ card }: { card: CardRow }) {
       setMuted(false);
       return;
     }
-
     state.gain.gain.setValueAtTime(Math.max(state.gain.gain.value, 0.0001), now);
     state.gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
     setMuted(true);
@@ -148,7 +178,7 @@ export default function CardDisplay({ card }: { card: CardRow }) {
           <div className="inline-flex rounded-full border border-white/60 bg-background/82 px-3.5 py-2 shadow-lg backdrop-blur-xl">
             <BrandLogo className="h-8 w-auto max-w-[128px] object-contain" priority />
           </div>
-          {phase === "revealed" && audioRef.current && (
+          {phase === "revealed" && (audioRef.current || mp3Ref.current) && (
             <button
               type="button"
               onClick={toggleAudio}
