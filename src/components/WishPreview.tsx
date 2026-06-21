@@ -82,10 +82,10 @@ export function WishPreview({ type, to, from, message, bg, photo, photoY = 0, on
               backgroundSize: "cover",
               backgroundPosition: `center ${photoY}%`,
               backgroundRepeat: "no-repeat",
-              opacity: 0.45,
-              filter: "blur(8px) saturate(1.2)",
-              maskImage: "linear-gradient(to bottom, black 0%, black 20%, transparent 42%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 20%, transparent 42%)",
+              opacity: 0.55,
+              filter: "blur(3px) saturate(1.1)",
+              maskImage: "linear-gradient(to bottom, black 25%, transparent 50%)",
+              WebkitMaskImage: "linear-gradient(to bottom, black 25%, transparent 50%)",
             }}
           />
         </div>
