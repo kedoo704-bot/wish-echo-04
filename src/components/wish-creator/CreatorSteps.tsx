@@ -32,7 +32,7 @@ export function OccasionStep({
             emoji={item.emoji}
             label={item.label}
             onClick={() => onSelect(item.id)}
-            wide={item.id === "congrats"}
+            wide={item.id === "custom"}
           />
         ))}
       </div>
