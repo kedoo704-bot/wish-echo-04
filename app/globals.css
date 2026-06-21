@@ -309,75 +309,151 @@ body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }
   align-items: center;
 }
 
-.recipient-cover {
+/* ── Envelope scene ─────────────────────────────────────────── */
+.envelope-scene {
   position: absolute;
   inset: 0;
   z-index: 30;
-  display: grid;
-  min-height: min(74dvh, 680px);
-  width: 100%;
-  overflow: hidden;
-  border-radius: 2.75rem;
-  border: 1px solid oklch(1 0 0 / 0.22);
-  background:
-    radial-gradient(340px 260px at 10% 12%, oklch(1 0 0 / 0.2), transparent 72%),
-    radial-gradient(420px 300px at 96% 92%, oklch(0.9 0.16 30 / 0.34), transparent 70%),
-    linear-gradient(135deg, #ff4e88 0%, #ff737e 46%, #ff9a8b 100%);
-  color: white;
-  box-shadow: 0 42px 90px -42px oklch(0.34 0.16 350 / 0.58);
-  transform-origin: center 32%;
-}
-
-.recipient-cover.is-leaving {
-  pointer-events: none;
-  animation: recipient-cover-exit 760ms cubic-bezier(0.22, 1.08, 0.34, 1) both;
-}
-
-.recipient-cover-inner {
-  position: relative;
-  z-index: 2;
   display: flex;
-  min-height: min(74dvh, 680px);
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  padding: clamp(1.5rem, 8cqw, 3.5rem);
-  text-align: center;
+  justify-content: flex-end;
+  padding-bottom: clamp(2.5rem, 10cqw, 5rem);
+  gap: 2rem;
+  min-height: min(74dvh, 680px);
+  cursor: pointer;
+  user-select: none;
 }
 
-.recipient-glow {
+.envelope-body {
+  position: relative;
+  width: clamp(220px, 72cqw, 320px);
+  height: clamp(155px, 50cqw, 224px);
+  border-radius: 4px 4px 10px 10px;
+  background: oklch(0.95 0.04 45);
+  box-shadow:
+    0 4px 0 0 oklch(0.82 0.07 45),
+    0 24px 64px -16px oklch(0.5 0.1 40 / 0.35);
+}
+
+.envelope-interior {
   position: absolute;
-  width: min(48cqw, 18rem);
-  aspect-ratio: 1;
-  border-radius: 999px;
-  filter: blur(28px);
-  opacity: 0.42;
-  mix-blend-mode: screen;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: clamp(90px, 30cqw, 130px);
+  background: oklch(0.78 0.07 40 / 0.55);
+  z-index: 1;
+  border-radius: 4px 4px 0 0;
 }
 
-.recipient-glow-one {
-  left: -12%;
-  top: -8%;
-  background: oklch(1 0 0 / 0.82);
+.envelope-fold-bottom {
+  position: absolute;
+  inset: 0;
+  background: oklch(0.88 0.06 45);
+  clip-path: polygon(0% 100%, 100% 100%, 50% 38%);
+  border-radius: 0 0 10px 10px;
+  z-index: 2;
 }
 
-.recipient-glow-two {
-  right: -14%;
-  bottom: -10%;
-  background: oklch(0.86 0.17 60 / 0.78);
+.envelope-fold-left {
+  position: absolute;
+  inset: 0;
+  background: oklch(0.91 0.05 45);
+  clip-path: polygon(0% 0%, 0% 100%, 50% 38%);
+  z-index: 2;
 }
 
-.recipient-pulse-line {
-  width: 2px;
-  height: 3.5rem;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, transparent, oklch(1 0 0 / 0.82), transparent);
-  animation: unwrap-indicator 1.3s ease-in-out infinite;
+.envelope-fold-right {
+  position: absolute;
+  inset: 0;
+  background: oklch(0.86 0.06 45);
+  clip-path: polygon(100% 0%, 100% 100%, 50% 38%);
+  z-index: 2;
 }
 
-.animate-gift-bounce {
-  animation: gift-bounce 1.7s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+.envelope-flap {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: clamp(90px, 30cqw, 130px);
+  background: oklch(0.92 0.05 45);
+  clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+  transform-origin: top center;
+  transform: perspective(600px) rotateX(0deg);
+  z-index: 20;
+  backface-visibility: hidden;
+  will-change: transform;
+  filter: drop-shadow(0 2px 4px oklch(0.5 0.08 45 / 0.2));
+}
+
+.envelope-flap.is-open {
+  animation: envelope-flap-open 420ms cubic-bezier(0.22, 1.08, 0.34, 1) both;
+}
+
+.envelope-card-teaser {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 0;
+  transform: translateY(-40%);
+  z-index: 10;
+  background: oklch(1 0 0 / 0.97);
+  border-radius: 1.25rem 1.25rem 0.5rem 0.5rem;
+  padding: clamp(0.75rem, 4cqw, 1.25rem) clamp(0.75rem, 4cqw, 1.25rem) clamp(0.5rem, 3cqw, 1rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow:
+    0 -6px 24px -6px oklch(0.4 0.12 350 / 0.18),
+    0 2px 8px oklch(0.5 0.08 45 / 0.12);
+  will-change: transform, opacity;
+}
+
+.envelope-card-teaser.is-rising {
+  animation: teaser-card-rise 500ms cubic-bezier(0.22, 1.08, 0.34, 1) both;
+}
+
+.teaser-emoji {
+  font-size: clamp(1.8rem, 7cqw, 2.5rem);
+  line-height: 1;
+}
+
+.teaser-label {
+  font-size: clamp(0.6rem, 2.2cqw, 0.75rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground, oklch(0.55 0.02 260));
+}
+
+.teaser-to {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 4.5cqw, 1.4rem);
+  color: var(--color-foreground, oklch(0.15 0.02 260));
+  line-height: 1.2;
+}
+
+.envelope-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  color: oklch(0.42 0.04 320 / 0.72);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  animation: envelope-prompt-pulse 2.4s ease-in-out infinite;
+}
+
+.envelope-prompt-icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  stroke-width: 2.5;
 }
 
 .recipient-card-unwrapped {
@@ -424,19 +500,21 @@ body { -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; }
   animation: love-panel-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) 240ms both;
 }
 
-@keyframes recipient-cover-exit {
-  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
-  100% { opacity: 0; transform: translate3d(0, -180px, 0) scale(1.12); }
+@keyframes envelope-flap-open {
+  0%   { transform: perspective(600px) rotateX(0deg); opacity: 1; }
+  65%  { transform: perspective(600px) rotateX(-155deg); opacity: 1; }
+  100% { transform: perspective(600px) rotateX(-170deg); opacity: 0.85; }
 }
 
-@keyframes gift-bounce {
-  0%, 100% { transform: translateY(0) rotate(-2deg); }
-  50% { transform: translateY(-10px) rotate(3deg); }
+@keyframes teaser-card-rise {
+  0%   { transform: translateY(-40%); opacity: 1; }
+  70%  { transform: translateY(calc(-40% - 130px)) scale(1.02); opacity: 1; }
+  100% { transform: translateY(calc(-40% - 120px)); opacity: 0; }
 }
 
-@keyframes unwrap-indicator {
-  0%, 100% { opacity: 0.35; transform: scaleY(0.72); }
-  50% { opacity: 1; transform: scaleY(1); }
+@keyframes envelope-prompt-pulse {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50%       { opacity: 1;    transform: translateY(-4px); }
 }
 
 @keyframes card-reveal {
