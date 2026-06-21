@@ -385,44 +385,6 @@ export async function renderGreetingCard(
     ctx.fillText(`— with love, ${wish.from}`, cx, fromY);
   }
 
-  /* ── 12. Footer bar ──────────────────────────────────────────────── */
-  const footY = CH - 62;
-
-  ctx.save();
-  ctx.strokeStyle = cfg.frame;
-  ctx.lineWidth = 1;
-  ctx.globalAlpha = 0.2;
-  ctx.beginPath();
-  ctx.moveTo(pad + 14, footY);
-  ctx.lineTo(CW - pad - 14, footY);
-  ctx.stroke();
-  ctx.globalAlpha = 1;
-  ctx.restore();
-
-  ctx.font = `400 12px ${SANS}`;
-  ctx.fillStyle = cfg.mutedColor;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "top";
-  ctx.globalAlpha = 0.5;
-  ctx.fillText("Jo dil mein hai, Kehdoo.  ·  kehdoo.com", cx, footY + 10);
-  ctx.globalAlpha = 1;
-
-  /* Seal */
-  const sx = CW - 72, sy = footY + 18;
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(sx, sy, 20, 0, Math.PI * 2);
-  ctx.strokeStyle = cfg.frame;
-  ctx.lineWidth = 1.5;
-  ctx.globalAlpha = 0.45;
-  ctx.stroke();
-  ctx.font = "17px serif";
-  ctx.fillStyle = cfg.frame;
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.fillText("✦", sx, sy);
-  ctx.globalAlpha = 1;
-  ctx.restore();
 }
 
 /* ─── Export helpers ─────────────────────────────────────────────────── */
@@ -436,10 +398,19 @@ export async function downloadCardAsPng(
   await document.fonts.ready;
   const canvas = document.createElement("canvas");
   await renderGreetingCard(canvas, wish, emoji, occasionLabel, photo);
+  const blob = await new Promise<Blob>((resolve, reject) =>
+    canvas.toBlob(
+      (b) => (b ? resolve(b) : reject(new Error("Canvas blob failed"))),
+      "image/png",
+      1.0,
+    ),
+  );
+  const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.download = `kehdoo-${wish.type}-card.png`;
-  a.href = canvas.toDataURL("image/png", 1.0);
+  a.href = url;
   a.click();
+  URL.revokeObjectURL(url);
 }
 
 export async function printCard(
