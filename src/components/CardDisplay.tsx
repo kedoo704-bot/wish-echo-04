@@ -198,7 +198,7 @@ export default function CardDisplay({ card }: { card: CardRow }) {
 
           <div className={revealed ? "recipient-card-unwrapped" : "pointer-events-none opacity-0"}>
             <GreetingCard
-              emoji={typeMeta.emoji}
+              emoji={isFathersDay ? "" : typeMeta.emoji}
               label={typeMeta.label}
               to={wish.to}
               from={wish.from}

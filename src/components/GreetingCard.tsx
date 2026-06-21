@@ -56,13 +56,15 @@ export function GreetingCard({
         </div>
       )}
 
-      <div
-        aria-hidden="true"
-        className="greeting-card-item greeting-card-emoji"
-        style={{ animation: "floaty 4s ease-in-out infinite" }}
-      >
-        {emoji}
-      </div>
+      {emoji && (
+        <div
+          aria-hidden="true"
+          className="greeting-card-item greeting-card-emoji"
+          style={{ animation: "floaty 4s ease-in-out infinite" }}
+        >
+          {emoji}
+        </div>
+      )}
       <p className="greeting-card-item mt-5 text-[10px] font-semibold uppercase tracking-[0.38em] text-muted-foreground">
         {label}
       </p>

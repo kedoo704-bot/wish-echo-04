@@ -69,7 +69,9 @@ export function WishPreview({ type, to, from, message, bg, photo }: Props) {
         </div>
       ) : null}
       <div className="relative z-10 px-7 py-10 text-center md:px-10 md:py-14">
-        <div aria-hidden="true" className="text-5xl md:text-6xl" style={{ animation: "floaty 5s ease-in-out infinite" }}>{t.emoji}</div>
+        {type !== "fathers-day" && (
+          <div aria-hidden="true" className="text-5xl md:text-6xl" style={{ animation: "floaty 5s ease-in-out infinite" }}>{t.emoji}</div>
+        )}
         <p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">{t.label}</p>
         {to ? (
           <h2 className="mt-5 font-serif text-4xl leading-[1.05] md:text-5xl">
