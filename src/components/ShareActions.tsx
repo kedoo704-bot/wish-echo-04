@@ -3,7 +3,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Check, Copy, Download, Share2 } from "lucide-react";
 import type { WishPayload } from "@/lib/wish";
-import { downloadCardAsPng, getCardAsBlob } from "@/lib/card-canvas";
+import { downloadCardAsPng } from "@/lib/card-canvas";
 import { getShareText, getShareTitle } from "@/lib/share";
 
 /**
@@ -122,33 +122,6 @@ export function ShareActions({
     }
   };
 
-  const handleWhatsAppStory = async () => {
-    setDownloading(true);
-    setActionNotice("");
-    try {
-      const blob = await getCardAsBlob(wish, emoji, label, photo);
-      const file = new File([blob], `kehdoo-${wish.type}-card.png`, { type: "image/png" });
-      const shareData = { files: [file] };
-      if (typeof navigator.canShare === "function" && navigator.canShare(shareData)) {
-        await navigator.share(shareData);
-      } else {
-        // Fallback: download the image so they can add to story manually
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.download = `kehdoo-${wish.type}-card.png`;
-        a.href = url;
-        a.click();
-        URL.revokeObjectURL(url);
-        setActionNotice("Image saved — open WhatsApp and add it to your Status.");
-      }
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return;
-      setActionNotice("Couldn't share. Use the Save button and add to WhatsApp Status manually.");
-    } finally {
-      setDownloading(false);
-    }
-  };
-
   return (
     <div
       className={`safe-bottom fixed inset-x-0 bottom-0 z-50 px-4 pb-5 pt-6 transition-all duration-700 delay-200 ${
@@ -178,15 +151,6 @@ export function ShareActions({
             aria-label="Share text"
           />
         )}
-
-        <button
-          onClick={handleWhatsAppStory}
-          disabled={downloading}
-          className="btn-3d mb-2 flex h-12 w-full items-center justify-center gap-2 rounded-2xl text-sm font-semibold disabled:opacity-50"
-        >
-          <WhatsAppIcon className="h-5 w-5 text-[#25D366]" />
-          Add to WhatsApp Story
-        </button>
 
         <div className="grid grid-cols-4 gap-2">
           <button

@@ -427,24 +427,6 @@ export async function renderGreetingCard(
 
 /* ─── Export helpers ─────────────────────────────────────────────────── */
 
-export async function getCardAsBlob(
-  wish: WishPayload,
-  emoji: string,
-  occasionLabel: string,
-  photo?: string | null,
-): Promise<Blob> {
-  await document.fonts.ready;
-  const canvas = document.createElement("canvas");
-  await renderGreetingCard(canvas, wish, emoji, occasionLabel, photo);
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => (blob ? resolve(blob) : reject(new Error("Canvas blob failed"))),
-      "image/png",
-      1.0,
-    );
-  });
-}
-
 export async function downloadCardAsPng(
   wish: WishPayload,
   emoji: string,

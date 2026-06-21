@@ -37,14 +37,13 @@ export function WishPreview({ type, to, from, message, bg, photo, photoY = 0, on
   const dragRef = useRef<{ startY: number; startPhotoY: number } | null>(null);
 
   const startDrag = (clientY: number) => {
-    if (!onPhotoDrag) return;
     dragRef.current = { startY: clientY, startPhotoY: photoY };
   };
 
   const moveDrag = (clientY: number) => {
     if (!dragRef.current || !onPhotoDrag) return;
     const dy = clientY - dragRef.current.startY;
-    // Drag down → pull photo down → reveal top of photo → decrease photoY
+    // drag down = reveal top of photo = decrease photoY
     const newY = Math.max(0, Math.min(100, dragRef.current.startPhotoY - dy * 0.5));
     onPhotoDrag(Math.round(newY));
   };
@@ -74,18 +73,8 @@ export function WishPreview({ type, to, from, message, bg, photo, photoY = 0, on
         </span>
       ))}
 
-      {photo && type === "fathers-day" ? (
-        <div
-          aria-hidden
-          className={`absolute inset-x-0 top-0 z-0 h-[55%]${onPhotoDrag ? " cursor-grab select-none touch-none active:cursor-grabbing" : ""}`}
-          onMouseDown={(e) => startDrag(e.clientY)}
-          onMouseMove={(e) => moveDrag(e.clientY)}
-          onMouseUp={endDrag}
-          onMouseLeave={endDrag}
-          onTouchStart={(e) => startDrag(e.touches[0].clientY)}
-          onTouchMove={(e) => moveDrag(e.touches[0].clientY)}
-          onTouchEnd={endDrag}
-        >
+      {photo && type === "fathers-day" && (
+        <div aria-hidden className="absolute inset-x-0 top-0 z-0 h-[55%]">
           <div
             className="absolute inset-0"
             style={{
@@ -98,19 +87,34 @@ export function WishPreview({ type, to, from, message, bg, photo, photoY = 0, on
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-card/30 to-card" />
-          {onPhotoDrag && (
-            <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
-              <span className="rounded-full bg-black/25 px-2.5 py-1 text-[10px] font-medium text-white/90 backdrop-blur-sm">
-                drag to reposition
-              </span>
-            </div>
-          )}
         </div>
-      ) : photo ? (
+      )}
+
+      {photo && type !== "fathers-day" && (
         <div className="absolute right-4 top-4 z-20 h-14 w-14 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-lg">
           <img src={photo} alt="" className="h-full w-full object-cover" />
         </div>
-      ) : null}
+      )}
+
+      {/* Drag overlay over photo area — z-30 beats content z-10 so events land here */}
+      {onPhotoDrag && photo && type === "fathers-day" && (
+        <div
+          className="absolute inset-x-0 top-0 z-30 h-[55%] cursor-grab touch-none select-none active:cursor-grabbing"
+          onMouseDown={(e) => startDrag(e.clientY)}
+          onMouseMove={(e) => moveDrag(e.clientY)}
+          onMouseUp={endDrag}
+          onMouseLeave={endDrag}
+          onTouchStart={(e) => startDrag(e.touches[0].clientY)}
+          onTouchMove={(e) => moveDrag(e.touches[0].clientY)}
+          onTouchEnd={endDrag}
+        >
+          <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center">
+            <span className="rounded-full bg-black/25 px-2.5 py-1 text-[10px] font-medium text-white/90 backdrop-blur-sm">
+              drag to reposition
+            </span>
+          </div>
+        </div>
+      )}
 
       <div className="relative z-10 px-7 py-10 text-center md:px-10 md:py-14">
         {type !== "fathers-day" && (
