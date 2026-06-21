@@ -38,9 +38,14 @@ export function GreetingCard({
             src={bgPhotoSrc}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
-            style={{ opacity: 0.52, filter: "blur(0.5px) saturate(1.15)", objectPosition: "center top" }}
+            style={{
+              opacity: 0.55,
+              filter: "blur(0.5px) saturate(1.1)",
+              objectPosition: "center top",
+              maskImage: "radial-gradient(ellipse 85% 75% at 50% 35%, black 30%, transparent 75%)",
+              WebkitMaskImage: "radial-gradient(ellipse 85% 75% at 50% 35%, black 30%, transparent 75%)",
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-card/80 via-card/70 to-card/85" />
         </div>
       )}
 

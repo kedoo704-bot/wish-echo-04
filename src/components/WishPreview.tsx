@@ -54,9 +54,14 @@ export function WishPreview({ type, to, from, message, bg, photo }: Props) {
             src={photo}
             alt=""
             className="absolute inset-0 h-full w-full object-cover"
-            style={{ opacity: 0.52, filter: "blur(0.5px) saturate(1.15)", objectPosition: "center top" }}
+            style={{
+              opacity: 0.55,
+              filter: "blur(0.5px) saturate(1.1)",
+              objectPosition: "center top",
+              maskImage: "radial-gradient(ellipse 85% 75% at 50% 35%, black 30%, transparent 75%)",
+              WebkitMaskImage: "radial-gradient(ellipse 85% 75% at 50% 35%, black 30%, transparent 75%)",
+            }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-card/75 via-card/65 to-card/80" />
         </div>
       ) : photo ? (
         <div className="absolute right-4 top-4 z-20 h-14 w-14 overflow-hidden rounded-full ring-2 ring-primary/40 shadow-lg">
