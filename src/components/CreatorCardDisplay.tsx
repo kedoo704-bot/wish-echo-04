@@ -13,6 +13,7 @@ export function CreatorCardDisplay({ card, recipientUrl }: { card: CardRow; reci
   const wish = card.payload;
   const typeMeta = MESSAGE_TYPES.find((m) => m.id === wish.type) ?? MESSAGE_TYPES[0];
   const photoUrl = card.photo_path ? getPhotoUrl(card.photo_path) : null;
+  const isFathersDay = wish.type === "fathers-day";
   const [revealed, setRevealed] = useState(false);
 
   useEffect(() => {
@@ -37,12 +38,14 @@ export function CreatorCardDisplay({ card, recipientUrl }: { card: CardRow; reci
 
       <div className="relative z-10 mx-auto max-w-2xl px-5 pt-20 md:px-8">
         <GreetingCard
-          emoji={typeMeta.emoji}
+          emoji={isFathersDay ? "" : typeMeta.emoji}
           label={typeMeta.label}
           to={wish.to}
           from={wish.from}
           message={wish.message}
-          photoSrc={photoUrl}
+          photoSrc={isFathersDay ? null : photoUrl}
+          bgPhotoSrc={isFathersDay ? photoUrl : null}
+          photoY={wish.photoY ?? 0}
           revealed={revealed}
         />
       </div>

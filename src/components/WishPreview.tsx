@@ -74,9 +74,9 @@ export function WishPreview({ type, to, from, message, bg, photo, photoY = 0, on
       ))}
 
       {photo && type === "fathers-day" && (
-        <div aria-hidden className="absolute inset-0 z-0 overflow-hidden rounded-[2rem]">
+        <div aria-hidden className="absolute inset-x-0 top-0 z-0 h-[45%] overflow-hidden rounded-t-[2rem]">
           <div
-            className="absolute inset-0"
+            className="absolute -inset-2"
             style={{
               backgroundImage: `url(${photo})`,
               backgroundSize: "cover",
@@ -84,9 +84,11 @@ export function WishPreview({ type, to, from, message, bg, photo, photoY = 0, on
               backgroundRepeat: "no-repeat",
               opacity: 0.55,
               filter: "blur(3px) saturate(1.1)",
-              maskImage: "linear-gradient(to bottom, black 25%, transparent 50%)",
-              WebkitMaskImage: "linear-gradient(to bottom, black 25%, transparent 50%)",
             }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{ background: "linear-gradient(to bottom, transparent 50%, rgba(255,255,255,0.97) 100%)" }}
           />
         </div>
       )}
