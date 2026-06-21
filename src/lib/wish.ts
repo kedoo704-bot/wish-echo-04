@@ -1,5 +1,5 @@
 export const MESSAGE_TYPES = [
-  { id: "fathers-day", label: "Happy Father's Day", emoji: "👨‍👧" },
+  { id: "fathers-day", label: "Happy Father's Day", emoji: "👔" },
   { id: "anniversary", label: "Happy Anniversary", emoji: "💍" },
   { id: "thank-you", label: "Thank You", emoji: "💖" },
   { id: "sorry", label: "Sorry", emoji: "🌸" },
@@ -68,7 +68,7 @@ export const MESSAGE_TEMPLATES: Record<string, Template[]> = {
     {
       id: "fd-1",
       label: "Heartfelt",
-      text: "Happy Father's Day! 👨‍👧 You've been my rock, my guide, and my biggest cheerleader. Thank you for everything you've done and everything you are. Love you so much.",
+      text: "Happy Father's Day! 👔 You've been my rock, my guide, and my biggest cheerleader. Thank you for everything you've done and everything you are. Love you so much.",
     },
     {
       id: "fd-2",
