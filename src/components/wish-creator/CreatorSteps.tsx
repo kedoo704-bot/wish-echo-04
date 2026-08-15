@@ -320,7 +320,9 @@ export function PreviewStep({
         </div>
       </div>
 
-      <div className="mx-auto max-w-[360px]">
+      {/* data-ph-mask: renders the user's own message live — exclude it
+          from PostHog session replay content capture. */}
+      <div data-ph-mask className="mx-auto max-w-[360px]">
         <WishPreview
           type={type}
           to={to}

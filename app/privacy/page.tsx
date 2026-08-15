@@ -59,11 +59,14 @@ export default function PrivacyPage() {
           <p>
             Kehdoo uses PostHog for aggregate, privacy-preserving product analytics — such as which
             pages are visited and which buttons are used — so we can see what&apos;s working and fix
-            what isn&apos;t. Kehdoo may also use Google Tag Manager to load a small number of
-            marketing tags. Kehdoo does not use fingerprinting scripts, and analytics events
-            aren&apos;t linked to your identity unless you sign in. If you sign in, Supabase
-            authentication cookies keep your session active. Card pages also use local browser
-            storage to avoid counting repeated opens from the same session.
+            what isn&apos;t. PostHog may also record anonymized session replays (how you move
+            through the app) to help us find and fix usability problems; the text of your wish
+            message and the recipient/sender names are masked and are never included in these
+            recordings. Kehdoo may also use Google Tag Manager to load a small number of marketing
+            tags. Kehdoo does not use fingerprinting scripts, and analytics events aren&apos;t
+            linked to your identity unless you sign in. If you sign in, Supabase authentication
+            cookies keep your session active. Card pages also use local browser storage to avoid
+            counting repeated opens from the same session.
           </p>
         </Section>
 
