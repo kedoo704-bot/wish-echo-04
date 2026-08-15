@@ -2,23 +2,21 @@ import type { Metadata } from "next";
 import WishCreator from "@/components/WishCreator";
 import StructuredData from "@/components/StructuredData";
 import { organizationLd, webAppLd } from "@/lib/seo";
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
+import { siteConfig, absoluteUrl } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Kehdoo - Jo dil mein hai, Kehdoo",
-  description:
-    "Turn a few words into a gorgeous animated greeting page. Share via WhatsApp, social, or QR. No sign-up required.",
-  alternates: { canonical: `${BASE}/` },
+  description: siteConfig.description,
+  alternates: { canonical: absoluteUrl("/") },
   openGraph: {
     title: "Kehdoo - Jo dil mein hai, Kehdoo",
     description: "Turn a few words into a gorgeous, animated greeting you can share instantly.",
     type: "website",
-    siteName: "Kehdoo",
-    url: `${BASE}/`,
+    siteName: siteConfig.name,
+    url: absoluteUrl("/"),
     images: [
       {
-        url: "/brand/og-image.png",
+        url: siteConfig.ogImage,
         width: 1200,
         height: 630,
         alt: "Kehdoo - Jo dil mein hai, Kehdoo",
@@ -29,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Kehdoo - Jo dil mein hai, Kehdoo",
     description: "Turn a few words into a gorgeous, animated greeting you can share instantly.",
-    images: ["/brand/og-image.png"],
+    images: [siteConfig.ogImage],
   },
 };
 

@@ -1,14 +1,16 @@
 import type { MetadataRoute } from "next";
+import { siteConfig } from "@/lib/site-config";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
+// Stable site-wide fallback. Bump this only when page structure/copy
+// meaningfully changes. A lastmod that moves on every build (e.g. via
+// `new Date()`) trains crawlers to ignore the signal.
+const SITE_LASTMOD = "2026-08-15";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
-
   return [
-    { url: `${BASE}/`, lastModified: now, changeFrequency: "weekly", priority: 1 },
-    { url: `${BASE}/about`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
-    { url: `${BASE}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
-    { url: `${BASE}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${siteConfig.url}/`, lastModified: SITE_LASTMOD, changeFrequency: "weekly", priority: 1 },
+    { url: `${siteConfig.url}/about`, lastModified: SITE_LASTMOD, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${siteConfig.url}/privacy`, lastModified: SITE_LASTMOD, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${siteConfig.url}/terms`, lastModified: SITE_LASTMOD, changeFrequency: "yearly", priority: 0.3 },
   ];
 }

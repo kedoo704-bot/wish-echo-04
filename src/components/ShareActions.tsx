@@ -2,9 +2,11 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { Check, Copy, Download, Share2 } from "lucide-react";
+import posthog from "posthog-js";
 import type { WishPayload } from "@/lib/wish";
 import { downloadCardAsPng } from "@/lib/card-canvas";
 import { getShareText, getShareTitle } from "@/lib/share";
+import { AnalyticsEvent } from "@/lib/analytics-events";
 
 /**
  * Creator-only share + download bar for a finished card. The caller supplies
@@ -94,6 +96,7 @@ export function ShareActions({
   const copy = () => copyValue(resolvedUrl);
 
   const tryNative = async () => {
+    posthog.capture(AnalyticsEvent.CARD_SHARE_CLICKED, { method: "native" });
     setActionNotice("");
     setManualCopyText("");
     if ("share" in navigator) {
@@ -117,6 +120,7 @@ export function ShareActions({
     setDownloading(true);
     try {
       await downloadCardAsPng(wish, emoji, label, photo);
+      posthog.capture(AnalyticsEvent.CARD_DOWNLOADED);
     } finally {
       setDownloading(false);
     }
@@ -164,6 +168,7 @@ export function ShareActions({
             href={shareWhatsapp}
             target="_blank"
             rel="noreferrer"
+            onClick={() => posthog.capture(AnalyticsEvent.CARD_SHARE_CLICKED, { method: "whatsapp" })}
             aria-label="Share on WhatsApp"
             title="Share on WhatsApp"
             className="btn-glass flex min-h-12 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 text-[10px] font-medium text-muted-foreground hover:text-foreground"

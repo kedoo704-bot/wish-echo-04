@@ -57,9 +57,13 @@ export default function PrivacyPage() {
 
         <Section title="Cookies & tracking">
           <p>
-            Kehdoo does not use analytics, tracking pixels, or fingerprinting scripts. If you sign
-            in, Supabase authentication cookies keep your session active. Card pages also use local
-            browser storage to avoid counting repeated opens from the same session.
+            Kehdoo uses PostHog for aggregate, privacy-preserving product analytics — such as which
+            pages are visited and which buttons are used — so we can see what&apos;s working and fix
+            what isn&apos;t. Kehdoo may also use Google Tag Manager to load a small number of
+            marketing tags. Kehdoo does not use fingerprinting scripts, and analytics events
+            aren&apos;t linked to your identity unless you sign in. If you sign in, Supabase
+            authentication cookies keep your session active. Card pages also use local browser
+            storage to avoid counting repeated opens from the same session.
           </p>
         </Section>
 
@@ -67,6 +71,32 @@ export default function PrivacyPage() {
           <p>
             Kehdoo uses Supabase for authentication, database storage, and photo storage. Supabase
             processes this data so Kehdoo can provide saved card links and optional dashboards.
+          </p>
+          <p>
+            Kehdoo uses PostHog to understand aggregate product usage. PostHog may process your IP
+            address and device/browser information to record these events according to its own{" "}
+            <a
+              href="https://posthog.com/privacy"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              privacy policy
+            </a>
+            .
+          </p>
+          <p>
+            Kehdoo may use Google Tag Manager to load marketing/advertising tags. Google may
+            process your IP address and device/browser information according to its own{" "}
+            <a
+              href="https://policies.google.com/privacy"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2 hover:text-foreground"
+            >
+              privacy policy
+            </a>
+            .
           </p>
           <p>
             Google provides optional sign-in. Google may process your sign-in request according to

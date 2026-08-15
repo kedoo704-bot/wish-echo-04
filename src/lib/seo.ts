@@ -1,4 +1,4 @@
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
+import { siteConfig } from "@/lib/site-config";
 
 /** Plain-text Q&A that doubles as crawlable AEO/GEO content and FAQPage JSON-LD. */
 export const FAQ: Array<{ q: string; a: string }> = [
@@ -31,18 +31,18 @@ export const FAQ: Array<{ q: string; a: string }> = [
 export const organizationLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Kehdoo",
-  url: SITE_URL,
+  name: siteConfig.name,
+  url: siteConfig.url,
   slogan: "Jo dil mein hai, Kehdoo.",
   description: "Create and share heartfelt animated greeting cards as a single link.",
-  logo: `${SITE_URL}/brand/app-full-logo.png`,
+  logo: `${siteConfig.url}/brand/app-full-logo.png`,
 };
 
 export const webAppLd = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "Kehdoo",
-  url: SITE_URL,
+  name: siteConfig.name,
+  url: siteConfig.url,
   applicationCategory: "LifestyleApplication",
   operatingSystem: "Any",
   description:
