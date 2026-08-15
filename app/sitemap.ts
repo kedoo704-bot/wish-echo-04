@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site-config";
 import { getAllOccasionSlugs } from "@/lib/occasion-content";
 import { getAllPredefinedSlugs } from "@/lib/garden-letters-content";
+import { getAllGardenLandingSlugs } from "@/lib/garden-landing-content";
 
 // Stable site-wide fallback. Bump this only when page structure/copy
 // meaningfully changes. A lastmod that moves on every build (e.g. via
@@ -28,6 +29,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: SITE_LASTMOD,
       changeFrequency: "yearly" as const,
       priority: 0.5,
+    })),
+    ...getAllGardenLandingSlugs().map((slug) => ({
+      url: `${siteConfig.url}/garden/write/${slug}`,
+      lastModified: SITE_LASTMOD,
+      changeFrequency: "monthly" as const,
+      priority: 0.65,
     })),
     { url: `${siteConfig.url}/about`, lastModified: SITE_LASTMOD, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/privacy`, lastModified: SITE_LASTMOD, changeFrequency: "yearly", priority: 0.3 },

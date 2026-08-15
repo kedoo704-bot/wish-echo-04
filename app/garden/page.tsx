@@ -4,6 +4,7 @@ import { PenLine } from "lucide-react";
 import { GardenChrome } from "@/components/garden/GardenChrome";
 import { GardenFeedGrid } from "@/components/garden/GardenFeedGrid";
 import { getAllPredefinedLetters } from "@/lib/garden-letters-content";
+import { getAllGardenLandingContent } from "@/lib/garden-landing-content";
 import { absoluteUrl } from "@/lib/site-config";
 
 export const dynamic = "force-static";
@@ -47,6 +48,24 @@ export default function GardenPage() {
         </div>
 
         <GardenFeedGrid letters={letters} />
+
+        <section className="mx-auto mt-20 max-w-3xl" aria-labelledby="ideas-heading">
+          <h2 id="ideas-heading" className="text-center text-sm font-semibold text-muted-foreground">
+            Not sure what to write? Try one of these
+          </h2>
+          <ul className="mt-4 flex flex-wrap justify-center gap-2">
+            {getAllGardenLandingContent().map((idea) => (
+              <li key={idea.slug}>
+                <Link
+                  href={`/garden/write/${idea.slug}`}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-3.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+                >
+                  {idea.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </section>
       </main>
     </GardenChrome>
   );
