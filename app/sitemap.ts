@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { siteConfig } from "@/lib/site-config";
 import { getAllOccasionSlugs } from "@/lib/occasion-content";
+import { getAllPredefinedSlugs } from "@/lib/garden-letters-content";
 
 // Stable site-wide fallback. Bump this only when page structure/copy
 // meaningfully changes. A lastmod that moves on every build (e.g. via
@@ -21,6 +22,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteConfig.url}/`, lastModified: SITE_LASTMOD, changeFrequency: "weekly", priority: 1 },
     { url: `${siteConfig.url}/wishes`, lastModified: SITE_LASTMOD, changeFrequency: "monthly", priority: 0.8 },
     ...occasionEntries,
+    { url: `${siteConfig.url}/garden`, lastModified: SITE_LASTMOD, changeFrequency: "monthly", priority: 0.7 },
+    ...getAllPredefinedSlugs().map((slug) => ({
+      url: `${siteConfig.url}/garden/${slug}`,
+      lastModified: SITE_LASTMOD,
+      changeFrequency: "yearly" as const,
+      priority: 0.5,
+    })),
     { url: `${siteConfig.url}/about`, lastModified: SITE_LASTMOD, changeFrequency: "monthly", priority: 0.7 },
     { url: `${siteConfig.url}/privacy`, lastModified: SITE_LASTMOD, changeFrequency: "yearly", priority: 0.3 },
     { url: `${siteConfig.url}/terms`, lastModified: SITE_LASTMOD, changeFrequency: "yearly", priority: 0.3 },

@@ -8,6 +8,8 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         // Keep private greetings, creator share pages, dashboard, and API routes out of crawls.
+        // Garden letters carry their own noindex meta as needed (see
+        // app/garden/[id]) rather than a blanket disallow here.
         disallow: ["/c/", "/share/", "/dashboard", "/api/"],
       },
     ],
