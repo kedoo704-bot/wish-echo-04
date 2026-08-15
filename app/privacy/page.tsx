@@ -145,6 +145,9 @@ export default function PrivacyPage() {
       <footer className="mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-6 text-xs text-muted-foreground">
         <p>(c) Kehdoo - kehdoo.com</p>
         <nav className="flex gap-4">
+          <Link href="/wishes" className="hover:text-foreground">
+            Wishes
+          </Link>
           <Link href="/about" className="hover:text-foreground">
             About
           </Link>
