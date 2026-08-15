@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
-import Link from "next/link";
-import { Camera, Flower2, X } from "lucide-react";
+import { Camera, X } from "lucide-react";
 import { BACKGROUNDS, MESSAGE_TYPES, type Template } from "@/lib/wish";
 import { MAX_MESSAGE_LENGTH } from "@/lib/limits";
 import { WishPreview } from "@/components/WishPreview";
@@ -20,15 +19,6 @@ export function OccasionStep({
   return (
     <div>
       <div className="mb-5">
-        <div className="mb-3 flex justify-end">
-          <Link
-            href="/garden"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-card/60 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:text-foreground"
-          >
-            <Flower2 className="h-3.5 w-3.5" />
-            Visit the Garden
-          </Link>
-        </div>
         <h1 className="font-serif text-[34px] leading-[1.02]">What&apos;s the occasion?</h1>
         <p className="mt-2 text-[14px] leading-6 text-muted-foreground">
           Choose the closest feeling. You can still make it personal next.

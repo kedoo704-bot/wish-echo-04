@@ -55,6 +55,17 @@ export default function WishCreator() {
           </div>
         </header>
 
+        {creator.step === 0 && (
+          <div className="app-gutter relative z-40 shrink-0 bg-background/92 pt-3">
+            <div className="grid grid-cols-2 gap-1 rounded-full bg-muted p-1 text-sm font-medium">
+              <span className="rounded-full bg-background py-1.5 text-center shadow-sm">Wishes</span>
+              <Link href="/garden" className="rounded-full py-1.5 text-center text-muted-foreground transition hover:text-foreground">
+                🌸 Garden
+              </Link>
+            </div>
+          </div>
+        )}
+
         <div className="app-gutter relative z-40 shrink-0 bg-background/92 py-3 backdrop-blur-xl">
           <StepHeader labels={STEP_LABELS} step={creator.step} />
         </div>
