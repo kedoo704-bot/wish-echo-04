@@ -55,6 +55,17 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
+        <Section title="The Garden">
+          <p>
+            Kehdoo&apos;s Garden (<Link href="/garden" className="underline underline-offset-2">kehdoo.com/garden</Link>)
+            has two kinds of letters. The starter letters shown there are fixed example content, not
+            written by visitors. A letter you write yourself works like a regular Kehdoo card — signing
+            in isn&apos;t required, and it&apos;s reachable by anyone with its link but isn&apos;t
+            listed publicly for others to browse. It runs through an automated filter before it&apos;s
+            created. Don&apos;t include anything in a letter you wouldn&apos;t want its recipient to see.
+          </p>
+        </Section>
+
         <Section title="Cookies & tracking">
           <p>
             Kehdoo uses PostHog for aggregate, privacy-preserving product analytics — such as which

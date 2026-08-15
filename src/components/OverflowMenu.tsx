@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FileText, Info, LayoutGrid, LogOut, MoreVertical, Shield } from "lucide-react";
+import { FileText, Flower2, Info, LayoutGrid, LogOut, MoreVertical, Shield } from "lucide-react";
 import { createOptionalClient } from "@/lib/supabase/client";
 
 type AuthUser = {
@@ -127,6 +127,10 @@ export default function OverflowMenu({ user = null }: Props) {
             </>
           )}
 
+          <Link href="/garden" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
+            <Flower2 className="h-4 w-4 text-muted-foreground" />
+            Garden
+          </Link>
           <Link href="/about" role="menuitem" onClick={() => setOpen(false)} className={itemClass}>
             <Info className="h-4 w-4 text-muted-foreground" />
             About
