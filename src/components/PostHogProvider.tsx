@@ -14,6 +14,16 @@ if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_POSTHOG_KEY) {
     // be created without signing in, so most traffic should stay anonymous
     // until someone actually authenticates via identify().
     person_profiles: "identified_only",
+    // Session replay. Recording only actually starts if "Record user
+    // sessions" is also turned on in the PostHog project settings — this
+    // config just fixes the privacy-safe defaults for when it is. The wish
+    // creator's message/name/photo inputs carry personal content, so mask
+    // every input value and every element tagged ph-mask (not just
+    // passwords) rather than relying on posthog-js's own defaults.
+    session_recording: {
+      maskAllInputs: true,
+      maskTextSelector: "[data-ph-mask]",
+    },
   });
 }
 

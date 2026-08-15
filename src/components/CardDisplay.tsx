@@ -196,7 +196,12 @@ export default function CardDisplay({ card }: { card: CardRow }) {
             </button>
           )}
 
-          <div className={revealed ? "recipient-card-unwrapped" : "pointer-events-none opacity-0"}>
+          {/* data-ph-mask: this renders the sender's personal message —
+              exclude it from PostHog session replay content capture. */}
+          <div
+            data-ph-mask
+            className={revealed ? "recipient-card-unwrapped" : "pointer-events-none opacity-0"}
+          >
             <GreetingCard
               emoji={isFathersDay ? "" : typeMeta.emoji}
               label={typeMeta.label}
