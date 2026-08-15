@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
+import { AnalyticsEvent } from "@/lib/analytics-events";
 import {
   BACKGROUNDS,
   MESSAGE_TEMPLATES,
@@ -200,6 +202,7 @@ export function useWishCreator() {
     try {
       setSavingLabel(photoFile ? "Optimizing photo" : "Creating your link");
       const id = await saveCard(payload, photoFile);
+      posthog.capture(AnalyticsEvent.WISH_CREATED, { wish_type: type, has_photo: !!photoFile });
       router.push(`/share/${id}`);
     } catch {
       setNotice("We couldn't create a short share link. Please try again in a moment.");

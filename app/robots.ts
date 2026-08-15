@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
+import { siteConfig } from "@/lib/site-config";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -12,7 +11,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/c/", "/share/", "/dashboard", "/api/"],
       },
     ],
-    sitemap: `${BASE}/sitemap.xml`,
-    host: BASE,
+    sitemap: `${siteConfig.url}/sitemap.xml`,
+    host: siteConfig.url,
   };
 }

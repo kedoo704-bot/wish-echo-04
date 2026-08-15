@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { CreatorCardDisplay } from "@/components/CreatorCardDisplay";
 import { getCardById } from "@/lib/get-card";
+import { absoluteUrl } from "@/lib/site-config";
 
 type Props = { params: Promise<{ id: string }> };
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
 
 export const revalidate = 3600;
 
@@ -25,5 +24,5 @@ export default async function CreatorSharePage({ params }: Props) {
   const card = await getCardById(id);
   if (!card) notFound();
 
-  return <CreatorCardDisplay card={card} recipientUrl={`${BASE}/c/${id}`} />;
+  return <CreatorCardDisplay card={card} recipientUrl={absoluteUrl(`/c/${id}`)} />;
 }

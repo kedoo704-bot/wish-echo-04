@@ -1,16 +1,20 @@
 import type { Metadata, Viewport } from "next";
 import AppMotion from "@/components/AppMotion";
 import PwaRegister from "@/components/PwaRegister";
+import { PostHogProvider } from "@/components/PostHogProvider";
+import { PostHogPageView } from "@/components/PostHogPageView";
+import { GoogleTagManager } from "@/components/GoogleTagManager";
+import { siteConfig } from "@/lib/site-config";
 import "./globals.css";
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
 
 export const metadata: Metadata = {
   applicationName: "Kehdoo",
-  title: "Kehdoo — Jo dil mein hai, Kehdoo",
-  description:
-    "Turn a few words into a gorgeous animated greeting page. Share via WhatsApp, social or QR.",
-  metadataBase: new URL(BASE),
+  title: {
+    default: "Kehdoo — Jo dil mein hai, Kehdoo",
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
+  metadataBase: new URL(siteConfig.url),
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -32,7 +36,7 @@ export const metadata: Metadata = {
     description: "Turn a few words into a gorgeous, animated greeting you can share instantly.",
     type: "website",
     siteName: "Kehdoo",
-    url: BASE,
+    url: siteConfig.url,
     images: [
       {
         url: "/brand/og-image.png",
@@ -63,8 +67,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="grain">
-        <PwaRegister />
-        <AppMotion>{children}</AppMotion>
+        <GoogleTagManager />
+        <PostHogProvider>
+          <PostHogPageView />
+          <PwaRegister />
+          <AppMotion>{children}</AppMotion>
+        </PostHogProvider>
       </body>
     </html>
   );

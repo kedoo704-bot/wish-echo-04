@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import StructuredData from "@/components/StructuredData";
 import { FAQ, faqLd } from "@/lib/seo";
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
+import { absoluteUrl } from "@/lib/site-config";
 
 export const dynamic = "force-static";
 
@@ -11,7 +10,7 @@ export const metadata: Metadata = {
   title: "About Kehdoo — Free Animated Greeting Card Maker",
   description:
     "Kehdoo turns a short message into a beautiful animated greeting you can share as a single link via WhatsApp, social, or QR. Free, no sign-up required.",
-  alternates: { canonical: `${BASE}/about` },
+  alternates: { canonical: absoluteUrl("/about") },
 };
 
 export default function AboutPage() {

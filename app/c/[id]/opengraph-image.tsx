@@ -2,12 +2,12 @@ import { ImageResponse } from "next/og";
 import { MESSAGE_TYPES } from "@/lib/wish";
 import { getCardById } from "@/lib/get-card";
 import { getShareDescription, getShareTitle } from "@/lib/share";
+import { siteConfig } from "@/lib/site-config";
 
 export const runtime = "nodejs";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const PHOTO_BUCKET = "card-photos";
 
@@ -41,7 +41,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
   const title = wish ? getShareTitle(wish) : "A wish for you";
   const description = wish ? getShareDescription(wish) : "Someone sent you a mesmerising greeting";
 
-  const logoUrl = new URL("/brand/main-logo-lockup.png", BASE).toString();
+  const logoUrl = new URL("/brand/main-logo-lockup.png", siteConfig.url).toString();
   const photoUrl = await getPhotoDataUrl(card?.photo_path ?? null);
 
   return new ImageResponse(

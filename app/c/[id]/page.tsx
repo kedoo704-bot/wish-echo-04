@@ -4,10 +4,9 @@ import { MESSAGE_TYPES } from "@/lib/wish";
 import CardDisplay from "@/components/CardDisplay";
 import { getCardById } from "@/lib/get-card";
 import { getShareDescription, getShareTitle } from "@/lib/share";
+import { absoluteUrl } from "@/lib/site-config";
 
 type Props = { params: Promise<{ id: string }> };
-
-const BASE = process.env.NEXT_PUBLIC_SITE_URL || "https://kehdoo.com";
 
 // Card content is immutable; serve from the ISR cache and refresh hourly.
 export const revalidate = 3600;
@@ -20,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const type = MESSAGE_TYPES.find((item) => item.id === card.payload.type) ?? MESSAGE_TYPES[0];
   const title = getShareTitle(card.payload);
   const description = getShareDescription(card.payload);
-  const url = `${BASE}/c/${id}`;
+  const url = absoluteUrl(`/c/${id}`);
   const image = `${url}/opengraph-image`;
 
   return {
