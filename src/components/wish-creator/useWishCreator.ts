@@ -131,6 +131,20 @@ export function useWishCreator() {
     pushStep(1);
   };
 
+  // Deep-link support: occasion landing pages (/wishes/[slug]) link back here
+  // with ?type=<occasion-id> so the CTA drops the visitor straight into the
+  // message step for that occasion instead of the generic picker. Read via
+  // window.location rather than useSearchParams to avoid opting this page
+  // out of static rendering for a one-time initial value.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const requested = new URLSearchParams(window.location.search).get("type");
+    if (requested && MESSAGE_TYPES.some((item) => item.id === requested)) {
+      selectOccasion(requested);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const selectTemplate = (template: Template) => {
     setNotice("");
     if (selectedTemplateId === template.id) {
