@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Bell, BellRing } from "lucide-react";
+import { Bell, BellRing, RotateCcw } from "lucide-react";
 import posthog from "posthog-js";
-import { pushSupported, subscribeToCardOpenAlert } from "@/lib/push-client";
+import { pushSupported, subscribeToCardOpenAlert, type SubscribeResult } from "@/lib/push-client";
 import { AnalyticsEvent } from "@/lib/analytics-events";
 
-type Status = "idle" | "loading" | "subscribed" | "denied" | "unsupported";
+type Status = "idle" | "loading" | SubscribeResult;
 
 /**
  * "Let me know when they open it" — shown on the creator's own share page
@@ -21,9 +21,17 @@ export function NotifyOnOpenButton({ cardId }: { cardId: string }) {
 
   const subscribe = async () => {
     setStatus("loading");
-    const result = await subscribeToCardOpenAlert(cardId);
-    if (result === "subscribed") posthog.capture(AnalyticsEvent.CARD_OPEN_ALERT_ENABLED);
-    setStatus(result);
+    try {
+      const result = await subscribeToCardOpenAlert(cardId);
+      if (result === "subscribed") posthog.capture(AnalyticsEvent.CARD_OPEN_ALERT_ENABLED);
+      setStatus(result);
+    } catch {
+      // subscribeToCardOpenAlert already catches internally and resolves to
+      // "error" rather than rejecting — this is a last-resort guard so a
+      // truly unexpected throw still can't leave the button stuck on
+      // "Enabling…" forever with no way to retry.
+      setStatus("error");
+    }
   };
 
   if (status === "subscribed") {
@@ -40,6 +48,19 @@ export function NotifyOnOpenButton({ cardId }: { cardId: string }) {
       <p className="mx-auto w-fit text-center text-[11px] text-muted-foreground">
         Notifications are blocked in your browser settings — you can still check view count from your dashboard.
       </p>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <button
+        type="button"
+        onClick={subscribe}
+        className="btn-glass mx-auto flex w-fit items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-medium text-destructive transition hover:opacity-80"
+      >
+        <RotateCcw className="h-3.5 w-3.5" />
+        Couldn&apos;t enable notifications — tap to retry
+      </button>
     );
   }
 

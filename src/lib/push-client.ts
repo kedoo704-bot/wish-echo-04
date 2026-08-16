@@ -20,33 +20,60 @@ export function pushSupported(): boolean {
   );
 }
 
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error(`Timed out waiting for ${label}`)), ms)),
+  ]);
+}
+
+export type SubscribeResult = "subscribed" | "denied" | "unsupported" | "error";
+
 /**
  * Requests notification permission and subscribes this browser to be
  * notified when `cardId` is first opened — see app/api/cards/[id]/subscribe
  * and app/api/cards/[id]/view (which triggers the actual send).
+ *
+ * Doesn't assume anything else already registered the service worker —
+ * PwaRegister.tsx only does that in production builds (deliberately, to
+ * avoid stale-cache confusion in dev), so this registers/waits for its own
+ * registration here. Everything is timeout-guarded: a stuck service worker
+ * or a browser that silently never resolves `.ready` must not leave the
+ * "Notify me" button hung on "Enabling…" forever with no feedback.
  */
-export async function subscribeToCardOpenAlert(cardId: string): Promise<"subscribed" | "denied" | "unsupported"> {
+export async function subscribeToCardOpenAlert(cardId: string): Promise<SubscribeResult> {
   if (!pushSupported()) return "unsupported";
 
-  const permission = await Notification.requestPermission();
-  if (permission !== "granted") return "denied";
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") return "denied";
 
-  const registration = await navigator.serviceWorker.ready;
-  const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
+    await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+    const registration = await withTimeout(navigator.serviceWorker.ready, 8000, "the service worker");
 
-  const subscription =
-    (await registration.pushManager.getSubscription()) ??
-    (await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
-    }));
+    const publicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!;
+    const subscription =
+      (await registration.pushManager.getSubscription()) ??
+      (await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(publicKey),
+      }));
 
-  const json = subscription.toJSON();
-  await fetch(`/api/cards/${cardId}/subscribe`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
-  });
+    const json = subscription.toJSON();
+    const res = await withTimeout(
+      fetch(`/api/cards/${cardId}/subscribe`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ endpoint: json.endpoint, keys: json.keys }),
+      }),
+      8000,
+      "the save request"
+    );
+    if (!res.ok) return "error";
 
-  return "subscribed";
+    return "subscribed";
+  } catch (err) {
+    console.error("[push] subscribe failed:", err);
+    return "error";
+  }
 }
