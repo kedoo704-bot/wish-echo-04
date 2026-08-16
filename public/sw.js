@@ -67,3 +67,38 @@ async function staleWhileRevalidate(request) {
     .catch(() => cached);
   return cached || network;
 }
+
+// "Notify me when they open it" — see src/lib/push-client.ts (subscribe)
+// and src/lib/push-server.ts (send). The payload is plain JSON, not
+// encrypted app data, so no card content ever passes through this.
+self.addEventListener("push", (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    // Non-JSON payload — fall back to the defaults below.
+  }
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || "Kehdoo", {
+      body: data.body || "",
+      icon: "/brand/icon-192.png",
+      badge: "/brand/icon-192.png",
+      data: { url: data.url || "/" },
+    })
+  );
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+  const url = event.notification.data && event.notification.data.url ? event.notification.data.url : "/";
+
+  event.waitUntil(
+    self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(url) && "focus" in client) return client.focus();
+      }
+      if (self.clients.openWindow) return self.clients.openWindow(url);
+    })
+  );
+});

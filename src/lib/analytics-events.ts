@@ -8,4 +8,5 @@ export const AnalyticsEvent = {
   WISH_CREATED: "wish_created",
   CARD_SHARE_CLICKED: "card_share_clicked",
   CARD_DOWNLOADED: "card_downloaded",
+  CARD_OPEN_ALERT_ENABLED: "card_open_alert_enabled",
 } as const;
