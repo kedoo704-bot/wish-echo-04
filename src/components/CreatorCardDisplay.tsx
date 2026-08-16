@@ -6,6 +6,7 @@ import { MESSAGE_TYPES } from "@/lib/wish";
 import { WishBackground } from "@/components/WishBackground";
 import { GreetingCard } from "@/components/GreetingCard";
 import { ShareActions } from "@/components/ShareActions";
+import { NotifyOnOpenButton } from "@/components/NotifyOnOpenButton";
 import { BrandLogo } from "@/components/BrandLogo";
 import { getPhotoUrl, type CardRow } from "@/lib/cards";
 
@@ -48,6 +49,10 @@ export function CreatorCardDisplay({ card, recipientUrl }: { card: CardRow; reci
           photoY={wish.photoY ?? 0}
           revealed={revealed}
         />
+      </div>
+
+      <div className="relative z-10 mx-auto mt-4 max-w-2xl px-5 md:px-8">
+        <NotifyOnOpenButton cardId={card.id} />
       </div>
 
       <ShareActions

@@ -43,6 +43,29 @@ create policy card_photos_public_read
   to anon, authenticated
   using (bucket_id = 'card-photos');
 
+-- ─── Card open notifications ────────────────────────────────────────────
+-- Web Push subscriptions, one per (card, browser) — lets a card's sender
+-- opt in to "notify me when this is opened" right after creating it,
+-- without needing an account: possession of the card id is the same trust
+-- boundary /share/[id] already uses. Only the service-role client ever
+-- reads or writes this table (subscribe on the client, send + prune on
+-- view) — no anon/authenticated policies needed, default-deny is correct.
+
+create table if not exists public.card_push_subscriptions (
+  id bigint generated always as identity primary key,
+  card_id text not null references public.cards(id) on delete cascade,
+  endpoint text not null,
+  p256dh text not null,
+  auth text not null,
+  created_at timestamptz not null default now(),
+  unique (card_id, endpoint)
+);
+
+create index if not exists card_push_subscriptions_card_id_idx
+  on public.card_push_subscriptions (card_id);
+
+alter table public.card_push_subscriptions enable row level security;
+
 -- ─── Garden letters ─────────────────────────────────────────────────────
 -- A deliberately separate table/stream from `cards` above — public,
 -- anonymously-authored notes decorated with an illustrated flower cluster.
